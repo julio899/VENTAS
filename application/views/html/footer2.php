@@ -34,6 +34,22 @@ $datauser=$this->session->userdata('datos_usuario');
             </div>
         </div>
       
+
+
+              <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                  <h3 id="myModalLabel">Detalle de su Pedido</h3>
+                </div>
+                <div class="modal-body">
+                  <p id="detalle_pedido"></p>
+                </div>
+                <div class="modal-footer">
+                  <!-- <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button> -->
+                  <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Continuar con este cliente</button>
+                  <a title="Nuevo Pedido" href="<?php echo base_url().index_page();?>/ventas/nuevo_pedido"><button class="btn btn-success">Nuevo Pedido</button></a>
+                </div>
+              </div>
     </footer>
 
 
@@ -41,21 +57,165 @@ $datauser=$this->session->userdata('datos_usuario');
       <!--Import jQuery before materialize.js-->
       <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
       <script type="text/javascript" src="<?php echo base_url();?>js/materialize.min.js"></script>
+      <script type="text/javascript" src="<?php echo base_url();?>js/bootstrap-modal.js"></script>
 
       <script>
+
+//variables de la tabla y que usaremos a lo largo de la ejecucion
+var tabla=$('#tabla');
+var tablallena=new Array();
+
+      $('#proveedores').on('change', function() {
+
+        //Armo la URL que me generara el Json de los productos para ese proveedor
+        var url_json='<?php echo base_url().index_page();?>/ventas/buscar_productos_por_proveedor/'+this.value;
+        
+/*
+$.getJSON(url_json, {format: "json"}, function(data) { 
+//$("h1").html(data[0].title); 
+//$("p").html(data[0].description); 
+$("h1").html(data[0].descr);
+});*/
+
+$.ajax({
+            'async': false,
+            'global': false,
+            'url': url_json,
+            'dataType': "json",
+            'success': function (data) {
+                json = data;        
+                $('#productos').html('');
+                   for (var i = 0; i < json.length; i++) {
+                     //alert(json[i].clave);
+                     $('#productos').append('<option value="'+json[i].clave+'">'+json[i].clave+' - '+json[i].descr+'</option>');
+                   };
+               }
+        });/*fin del Ajax para el Select de productos*/
+
+}); //fin de las acciones cuando cambie de prooveedor
+
+
+
       $(document).ready(function(){
+
+
          $('.dropdown-button').dropdown();
          $(".button-collapse").sideNav();
 
 
   $('.button-collapse').sideNav({
-      menuWidth: 300, // Default is 240
-      edge: 'right', // Choose the horizontal origin
-      closeOnClick: true // Closes side-nav on <a> clicks, useful for Angular/Meteor
-    }
-  );
-      
+      menuWidth: 280, // Default is 240
+    });
+
+
+
+
       });
+
+/* ###########################  
+   #    F U N C I O N E S    #
+   ###########################  */
+      
+function cargar(){
+              var codProveedor=$('#productos').val();
+              var cantidad=$('#cantidad').val();
+              var descripcion=$('#productos option:selected').text().substring(9);
+              if(codProveedor!=null||codProveedor==0){
+
+                                  if(cantidad!=null && cantidad>0){
+                                          $('table#tabla').append('<tr><td>'+codProveedor+'</td><td>'+descripcion+'</td><td>'+cantidad+'</td></tr>');
+                                          $('#cantidad').val('');
+                    
+                    
+                                          
+                                  }else{alert('INDIQUE LA CANTIDAD');}
+      
+              }else{alert('SELECCIONE UN PROVEEDOR');}
+              
+}/*fin de la funcion cargar*/
+
+function finalizarPedido(){
+  var tipo=$('#tipo').val();
+
+  if($('#tabla tr').length >1 ){
+
+      if(tipo!=null && tipo!=0){
+
+              if(confirm("Esta seguro  de Finalizar y enviar este pedido?")){
+                        var x=0;
+                        $('#tabla tr').each(function(){
+                          if(!this.rowIndex)return;//pasa la primera fila es decir la ignoramos por que es la cabecera de la tabla
+                          var codigo=this.cells[0].innerHTML;
+                          //var descripcion=this.cells[1].innerHTML;
+                          var cantidad=this.cells[2].innerHTML;
+                          
+                            tablallena[x]=[codigo,cantidad];
+                          x++;
+                          });
+                        
+                          console.clear();
+                         /*for(var z=1;z<tablallena.length;z++){
+                            console.log('Registro: '+z+' *** codigo:'+tablallena[z][0]+' - Descripcion:'+tablallena[z][1]+'\tcantidad:'+tablallena[z][2]);
+                             }*/
+
+                              $('#detalle_pedido').append('<p class="alert alert-warning"><strong>Porfavor espere mientras es cargado su pedido...<strong></p>');
+                              $('#detalle_pedido').append('<pre><h4>NO SALGA NI CANCELE ESTE PROCESO.<BR>PORFAVOR ESPERE...</h4></pre>');
+                              $('#detalle_pedido').append('<div class="progress"><div class="indeterminate"></div></div>');
+
+                              $('#myModal>div.modal-footer').hide();
+                              $('#myModal').modal('show');
+                        var nota_txt=$("#nota").val();
+                        $.post('<?php echo base_url().index_page();?>/ventas/generar_pedido_confirmado/',{ productos: tablallena, tipo_venta:tipo , nota:nota_txt}, function(data) {
+                            console.log(data);
+                            if (data) {
+                              $('#tabla tr').each(function(){
+                                if(!this.rowIndex)return;//pasa la primera fila   
+                                  //this.deleteCell();  //borra una celda interna   
+                                  //this.remove();  
+                                  $(this).find('td').html("");  
+                                  $('#myModal').modal({
+                                      keyboard: false
+                                    });
+                                  detalle_pedido();
+                                  $('#myModal>div.modal-footer').show();
+                                  $('#myModal').modal('show');  
+                                  //console.log(this);
+                            });
+
+                              console.log('su pedido se ha registrado satisfactoriamente.');
+                            }else{
+                              alert('Ocurrio un prolema durante el proceso...\nNo se pudo procesar su pedido.');
+                            }
+
+                        });//fin del post
+
+
+              }//fin del if de confirmacion
+
+        }else{ alert("SELECCIONE TIPO DE VENTA\n\tCOD o CR-10"); }
+            
+    
+  }else{
+        alert("Tienes que agregar almenos (1) un producto.\nEste Pedido se encuentra vacio");
+      }
+}/*fin de la funcion de finalizar pedido*/
+
+function detalle_pedido() {
+   var url_json="<?php echo base_url().index_page();?>/ventas/ultimo_pedido/2";
+  $.ajax({
+            'async': false,
+            'global': false,
+            'url': url_json,
+            'dataType': "json",
+            'success': function (data) {
+                json = data;        
+                $('#detalle_pedido').html('');
+                     //alert(json);
+                     $('#detalle_pedido').append('<p class="alert alert-success"><strong>Su Pedido ha sido cargado Satisfectoriamente.</strong></p><p><b>Pedido Cargado bajo el Nro.</b> <span class="badge">'+json+'</span><br></p>');
+
+               }
+        });/*fin del Ajax para pedido*/
+}
       </script>
 </body>
 </html>

@@ -52,6 +52,21 @@ color:#212121;
     margin-left: 15px;
   }
 
+  .proveedores{
+    width: 100%;
+  }
+  #btn_cargar,#btn_finalizar{
+   width: 100%;
+  }
+  select{
+    background-color:#00838f;
+    color: #c6ff00;
+  }
+  #productos{ color:#00e5ff;}
+  select>option{
+    color:white;
+  }
+
   @media only screen and (max-width: 800px) {
 .ocultar-en-movil{
   display:none!important;
