@@ -222,7 +222,7 @@ $datos_ult_pedido=array(
 
     }//fin del for
     if($resultado==TRUE){
-            $this->data_complemento->enviar_email_vendedor($idu,$datos_ult_pedido);
+            //$this->data_complemento->enviar_email_vendedor($idu,$datos_ult_pedido);
             //**********************************************************************
     }
     return $resultado;

@@ -8,6 +8,22 @@ $datauser=$this->session->userdata('datos_usuario');
 <!-- // FIN DEL CONTENIDO -->
 
 
+
+  <!-- Modal Structure -->
+  <div id="modal1" class="modal">
+    <div class="modal-content">
+      <h4>Pedido Cargado Satisfactoriamente</h4>
+      <p>detalle de su pedido</p>
+      <div id="carga_detalle"></div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="btn red modal-action modal-close waves-effect waves-green btn-flat">X</a>
+      <a title="Nuevo Pedido" class="btn" href="<?php echo base_url().index_page();?>/ventas/nuevo_pedido">Nuevo Pedido</a>
+                
+    </div>
+  </div>
+
+
 <!-- Footer -->
 <footer class="page-footer green">
       <div class="container">
@@ -34,23 +50,8 @@ $datauser=$this->session->userdata('datos_usuario');
             </div>
         </div>
       
-
-
-              <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                  <h3 id="myModalLabel">Detalle de su Pedido</h3>
-                </div>
-                <div class="modal-body">
-                  <p id="detalle_pedido"></p>
-                </div>
-                <div class="modal-footer">
-                  <!-- <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button> -->
-                  <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Continuar con este cliente</button>
-                  <a title="Nuevo Pedido" href="<?php echo base_url().index_page();?>/ventas/nuevo_pedido"><button class="btn btn-success">Nuevo Pedido</button></a>
-                </div>
-              </div>
     </footer>
+
 
 
 
@@ -101,7 +102,7 @@ $.ajax({
 
          $('.dropdown-button').dropdown();
          $(".button-collapse").sideNav();
-
+         $('.modal-trigger').leanModal();
 
   $('.button-collapse').sideNav({
       menuWidth: 280, // Default is 240
@@ -123,7 +124,7 @@ function cargar(){
               if(codProveedor!=null||codProveedor==0){
 
                                   if(cantidad!=null && cantidad>0){
-                                          $('table#tabla').append('<tr><td>'+codProveedor+'</td><td>'+descripcion+'</td><td>'+cantidad+'</td></tr>');
+                                          $('table#tabla > tbody').append('<tr><td>'+codProveedor+'</td><td>'+descripcion+'</td><td>'+cantidad+'</td></tr>');
                                           $('#cantidad').val('');
                     
                     
@@ -164,25 +165,30 @@ function finalizarPedido(){
 
                               $('#myModal>div.modal-footer').hide();
                               $('#myModal').modal('show');
+                              $('#myModal>div.modal-footer').show();
+                              $('#myModal').show();
                         var nota_txt=$("#nota").val();
                         $.post('<?php echo base_url().index_page();?>/ventas/generar_pedido_confirmado/',{ productos: tablallena, tipo_venta:tipo , nota:nota_txt}, function(data) {
                             console.log(data);
                             if (data) {
-                              $('#tabla tr').each(function(){
-                                if(!this.rowIndex)return;//pasa la primera fila   
-                                  //this.deleteCell();  //borra una celda interna   
-                                  //this.remove();  
-                                  $(this).find('td').html("");  
-                                  $('#myModal').modal({
-                                      keyboard: false
-                                    });
-                                  detalle_pedido();
-                                  $('#myModal>div.modal-footer').show();
-                                  $('#myModal').modal('show');  
-                                  //console.log(this);
-                            });
+                                                detalle_pedido();
+                                                /*
+                                               $('#tabla tr').each(function(){
+                                               if(!this.rowIndex)return;//pasa la primera fila   
+                                                //this.deleteCell();  //borra una celda interna   
+                                                //this.remove();  
+                                                $(this).find('td').html("");  
+                                                $('#myModal').modal({
+                                                    keyboard: false
+                                                  });
+                                                $('#myModal>div.modal-footer').show();
+                                                $('#myModal').modal('show');  
+                                                //console.log(this);
+                                          });*/
 
-                              console.log('su pedido se ha registrado satisfactoriamente.');
+                                 console.log('su pedido se ha registrado satisfactoriamente.');
+                                                $("table#tabla > tbody").remove();
+                                                console.log('borrando tabla');
                             }else{
                               alert('Ocurrio un prolema durante el proceso...\nNo se pudo procesar su pedido.');
                             }
@@ -201,7 +207,7 @@ function finalizarPedido(){
 }/*fin de la funcion de finalizar pedido*/
 
 function detalle_pedido() {
-   var url_json="<?php echo base_url().index_page();?>/ventas/ultimo_pedido/2";
+   var url_json="<?php echo base_url().index_page();?>/ventas/ultimo_pedido/";
   $.ajax({
             'async': false,
             'global': false,
@@ -211,8 +217,8 @@ function detalle_pedido() {
                 json = data;        
                 $('#detalle_pedido').html('');
                      //alert(json);
-                     $('#detalle_pedido').append('<p class="alert alert-success"><strong>Su Pedido ha sido cargado Satisfectoriamente.</strong></p><p><b>Pedido Cargado bajo el Nro.</b> <span class="badge">'+json+'</span><br></p>');
-
+                     $('#carga_detalle').append('<p><b>Pedido Cargado bajo el Nro.</b> <span class="nuevo badge">'+json+'</span><br></p>');
+                    $('#modal1').openModal();
                }
         });/*fin del Ajax para pedido*/
 }

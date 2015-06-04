@@ -55,9 +55,12 @@ if(isset($proveedores)){
 	</div>
 	<div class="col s12 m8">
 		<!-- Informacion del pedido -->
-		
+
 						<div id="pedido">
-							<table id="tabla" class="hoverable"><tr><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th></tr></table>
+							<table id="tabla" class="hoverable">
+								<thead><tr><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th></tr></thead> 
+								<tbody></tbody>
+							</table>
 								
 						</div>
 						<div class="light-green lighten-4">

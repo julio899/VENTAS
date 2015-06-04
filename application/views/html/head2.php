@@ -66,6 +66,15 @@ color:#212121;
   select>option{
     color:white;
   }
+span.badge.nuevo {
+  font-weight: 300;
+  font-size: 0.8rem;
+  color: #fff;
+  background-color: #26a69a;
+  border-radius: 2px;
+}
+
+
 
   @media only screen and (max-width: 800px) {
 .ocultar-en-movil{
