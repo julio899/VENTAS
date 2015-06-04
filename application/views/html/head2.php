@@ -70,6 +70,9 @@ color:#212121;
 .ocultar-en-movil600{
   display:none!important;
   }
+  .row .col {
+    padding: 0px!important;
+  }
 }
 
 </style>
