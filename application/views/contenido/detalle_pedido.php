@@ -7,7 +7,16 @@
 			</div>
 			<div class="col s4">
 					<?php
-					echo '<a class="btn orange" href="'.base_url().index_page().'/ventas/pedidos_enviados" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
+					$usuario=$this->session->userdata('datos_usuario');
+					if ($usuario['tipo']=='F') {
+						# en caso que sea supervisor o Facturador
+						echo '<a class="btn orange" href="'.base_url().index_page().'/facturacion" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
+					
+					}else{
+						# en casoq eu sea un vendedor
+						echo '<a class="btn orange" href="'.base_url().index_page().'/ventas/pedidos_enviados" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
+					
+					}
 					?>
 			</div>
 			<div class="col s4">

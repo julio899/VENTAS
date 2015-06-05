@@ -46,7 +46,9 @@ text-decoration: none;
 color:#212121;
   }
   li.collection-item>a:hover{color:white;}
-
+a#btn-inventario{
+  width: 100%;
+}
     table{
     font-size: 1.1em;
     margin-left: 15px;
@@ -55,7 +57,7 @@ color:#212121;
   .proveedores{
     width: 100%;
   }
-  #btn_cargar,#btn_finalizar{
+  #btn_cargar,#btn_finalizar,.btn100{
    width: 100%;
   }
   select{
@@ -74,6 +76,9 @@ span.badge.nuevo {
   border-radius: 2px;
 }
 
+ul#lateral-sup>li{
+  margin-top: 7px;
+}
 
 
   @media only screen and (max-width: 800px) {
@@ -132,10 +137,31 @@ span.badge.nuevo {
       </ul>
       <ul class="side-nav" id="mobile-demo">
         <li><a style="margin-left:15px; margin-right:15px;" href="<?php echo base_url().index_page()."/identificacion/cerrarSesion";?>" class="btn red">Salir</a></li>
-        <li><a class="collection-item active" href="<?php echo base_url().index_page()."/ventas/nuevo_pedido";?>">Generar Pedido</a></li> 
-        <li><a class="collection-item" href="<?php echo base_url().index_page()."/ventas/pedidos_enviados";?>">Pedidos Enviados</a></li>
-        <li><a class="collection-item" href="<?php echo base_url().index_page()."/imprimir";?>">IMPRESION DE FORMATO PEDIDO</a></li>                
-               
+        <?php if($datauser['tipo']=='F'){
+          ?>
+          
+                <li><a class="collection-item active" href="<?php echo base_url().index_page()."/facturacion";?>">INICIO</a></li> 
+      
+                <li><a href="<?php echo base_url().index_page().'/facturacion/'; ?>" class="collection-item blue">Bandeja de Entrada</a></li>
+                <li><a href="<?php echo base_url().index_page().'/facturacion/consultarVendedor'; ?>" class="collection-item blue">Consultar Vendedor</a></li>
+                <li>
+                            <li><a href="<?php echo base_url().index_page().'/facturacion/select_compa/existencia';?>">INVENTARIO Por Existencia</a></li>
+                            <li><a href="<?php echo base_url().index_page().'/facturacion/select_compa/nombre';?>">INVENTARIO Por Nombre</a></li>
+                          
+                </li>
+    
+
+          <?php 
+                //fin de if TIPO=F 
+                }else{
+                  ?>
+                      <li><a class="collection-item active" href="<?php echo base_url().index_page()."/ventas/nuevo_pedido";?>">Generar Pedido</a></li> 
+                      <li><a class="collection-item" href="<?php echo base_url().index_page()."/ventas/pedidos_enviados";?>">Pedidos Enviados</a></li>
+                      <li><a class="collection-item" href="<?php echo base_url().index_page()."/imprimir";?>">IMPRESION DE FORMATO PEDIDO</a></li>                
+                             
+                  <?php
+                }//fin del else en caso del vendedor
+           ?>
                 
                 
       </ul>
