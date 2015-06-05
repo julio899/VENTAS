@@ -9,7 +9,7 @@ class Facturacion extends CI_Controller{
 		$pedidos=$this->data_complemento->todos_pedidos();
 		$cant_pedidos_nuevos=$this->data_complemento->cantidad_pedidos_nuevos();
 
-					$tabla="<table class=\"table table-hover table-condensed tbl-ped-env\"><tr><th>Nro.</th><th>COMPA&Ntilde;IA</th><th class=\"ocultar-en-movil600\">ZONA</th><th>COD. CLIENTE</th><th>Raz&oacute;n Social</th><th class=\"ocultar-en-movil600\">FECHA</th><th>TIPO</th><th>Detalle</th></tr>";
+					$tabla="<table class=\"hoverable\"><tr><th>Nro.</th><th>COMPA&Ntilde;IA</th><th class=\"ocultar-en-movil600\">ZONA</th><th>COD. CLIENTE</th><th>Raz&oacute;n Social</th><th class=\"ocultar-en-movil600\">FECHA</th><th>TIPO</th><th>Detalle</th></tr>";
 				for ($i=0; $i < count($pedidos); $i++) { 
 					$cliente=$this->data_complemento->get_cliente($pedidos[$i]['codcte'],$pedidos[$i]['compa']);
 					$tipo="";
