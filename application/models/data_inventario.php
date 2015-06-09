@@ -208,4 +208,20 @@ function get_productos_proveedor($CodCompa='',$codpro=''){
 }
 
 
+
+public function get_nombre_producto($CodCompa,$codCompleto){
+    $this->load->database($this->get_compaTXT($CodCompa),TRUE);
+    $sql="SELECT  `descr` FROM  `01_inv` WHERE  `clave` LIKE  '$codCompleto'";
+    $query=$this->db->query($sql);
+    $respuesta=NULL;
+    foreach ($query->result() as $row)
+                {
+                    $respuesta=$row->descr;
+                }
+    return $respuesta;
+}//fin de get_nombre_producto
+
+
+
+
 }//fin de la clase

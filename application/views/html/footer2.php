@@ -12,12 +12,12 @@ $datauser=$this->session->userdata('datos_usuario');
   <!-- Modal Structure -->
   <div id="modal1" class="modal">
     <div class="modal-content">
-      <h4>Pedido Cargado Satisfactoriamente</h4>
+      <h4>Pedido Cargado con Exito</h4>
       <p>detalle de su pedido</p>
       <div id="carga_detalle"></div>
     </div>
     <div class="modal-footer">
-      <a href="#!" class="btn red modal-action modal-close waves-effect waves-green btn-flat">X</a>
+      <a href="#!" class="btn red modal-action modal-close waves-effect waves-green btn-flat"> Continuar </a>
       <a title="Nuevo Pedido" class="btn" href="<?php echo base_url().index_page();?>/ventas/nuevo_pedido">Nuevo Pedido</a>
                 
     </div>

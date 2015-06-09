@@ -105,21 +105,22 @@ function get_ciudad($id_vendedor){
 
 function enviar_email_vendedor($id_vendedor,$data){
 	$this->load->library('email');
+    $this->load->model('data_inventario');
 	$email_setting  = array('mailtype'=>'html');
 	$this->email->initialize($email_setting);
 	$this->email->from('ventas@didecoca.com', 'Aplicacion VENTAS');
 	$this->email->to('grupodideco.valencia@gmail.com');
-    //$this->email->to($this->get_email_vendedor($id_vendedor));
+    $this->email->to($this->get_email_vendedor($id_vendedor));
     //si es de VALENCIA el vendedor envio a Josemanuel una copia
     //if($this->get_ciudad($id_vendedor)=='VALENCIA'){  $this->email->cc("jomaor671967@hotmail.com");  }
-    //if($this->get_ciudad($id_vendedor)=='VALENCIA'){  $this->email->cc("grupodideco.valencia@gmail.com");  }
+    if($this->get_ciudad($id_vendedor)=='VALENCIA'){  $this->email->cc("grupodideco.valencia@gmail.com");  }
     $compa=strtoupper($data['compa']);
 	$this->email->subject('Hola '.strtoupper($data['usuario']).', Un Nuevo Pedido Ha sido Cargado./ '.$compa.' Nro['.$data['nroP'].']');
     $msj='<h1>Ha sido cargado en '.$compa.' un pedido bajo el Nro['.$data['nroP'].']</h1><pre>COMPAÑIA:'.$compa.'<br>zona: '.$data['zona'].'<br>CODIGO DEL CLIENTE: '.$data['codigoCliente'].'</pre>';
     $productos=$data['productos'];
 //var_dump($productos);
     for ($i=0; $i < count($productos); $i++) { 
-        $msj.="<br>CODIGO: ".$productos[$i][0]."  Cantidad:[".$productos[$i][1]."]";
+        $msj.="<br>CODIGO: ".$productos[$i][0]."  (".$this->data_inventario->get_nombre_producto($compa,$productos[$i][0]).") / Cantidad:[".$productos[$i][1]."]";
     }
     if($data['nota']!=""){
         $msj.="<br><hr><p><strong>Nota:</strong>".$data['nota']."</p>";
