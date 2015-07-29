@@ -76,7 +76,7 @@ function get_cliente($codCte='')
     	}
 }//fin de la funcion get_cliente
 
-	function get_ciudad_estado($codciudad,$codestado){
+function get_ciudad_estado($codciudad,$codestado){
 	$this->load->database($this->txtcompa,TRUE);
 	$query=$this->db->query("SELECT  `ciudades`.`nombre` ,  `estados`.`estado` FROM  `ciudades` ,  `estados` WHERE  `ciudades`.`codciud` LIKE  '".$codciudad."' AND  `estados`.`codesta` LIKE  '".$codestado."' LIMIT 1");
 			foreach ($query->result() as $row)
@@ -84,8 +84,6 @@ function get_cliente($codCte='')
 				   $this->temporal=array('ciudad'=>$row->nombre,'estado'=>$row->estado);
 				}
 	return $this->temporal;
-
-
 }//fin de get_ciudad_estado
 
 function get_proveedores(){
@@ -99,7 +97,8 @@ function get_proveedores(){
 
 }
 function get_productos_proveedor($codpro='',$data=''){
-    $sql="SELECT  `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`oferm`, `01_inv`.`oferd`, `01_inv`.`ofere`, `01_inv`.`ofers`, `01_inv`.`oferz`,`01inv`.`ventam`,`01inv`.`ventad`,`01inv`.`ventas`,`01inv`.`ventak`,`01inv`.`ventac`,`01inv`.`ventaz`,`01inv`.`existen`, `01_inv`.`st` FROM  `01_inv` ,  `01inv` WHERE  `01_inv`.`clave` LIKE  '$codpro%' AND  `01inv`.`clave` LIKE  `01_inv`.`clave` AND  `01_inv`.`st` LIKE  'A' ORDER BY  `01_inv`.`descr` DESC";
+ //OEM $sql="SELECT  `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`oferm`, `01_inv`.`oferd`, `01_inv`.`ofere`, `01_inv`.`ofers`, `01_inv`.`oferz`,`01inv`.`ventam`,`01inv`.`ventad`,`01inv`.`ventas`,`01inv`.`ventak`,`01inv`.`ventac`,`01inv`.`ventaz`,`01inv`.`existen`, `01_inv`.`st` FROM  `01_inv` ,  `01inv` WHERE  `01_inv`.`clave` LIKE  '$codpro%' AND  `01inv`.`clave` LIKE  `01_inv`.`clave` AND  `01_inv`.`st` LIKE  'A' ORDER BY  `01_inv`.`descr` DESC";
+ $sql="SELECT `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`st` FROM `01_inv` WHERE `01_inv`.`clave` LIKE '$codpro%' AND `01_inv`.`st` LIKE 'A' ORDER BY `01_inv`.`descr` DESC";
  //$this->load->database($this->txtcompa,TRUE);
  $temp="";
  switch ($this->session->userdata('compa_select')) {
@@ -124,7 +123,8 @@ if($temp!='default'){
     $query=$this->db->query($sql);
             foreach ($query->result() as $row)
                 {
-                   $data[]=array('clave'=>$row->clave,'descr'=>$row->descr,'oferm'=>$row->oferm,'oferd'=>$row->oferd,'ofere'=>$row->ofere,'ofers'=>$row->ofers,'oferz'=>$row->oferz,'ventam'=>$row->ventam,'ventad'=>$row->ventad,'ventas'=>$row->ventas,'ventak'=>$row->ventak,'ventac'=>$row->ventac,'ventaz'=>$row->ventaz,'st'=>$row->st,'existen'=>$row->existen);
+                  //OEM $data[]=array('clave'=>$row->clave,'descr'=>$row->descr,'oferm'=>$row->oferm,'oferd'=>$row->oferd,'ofere'=>$row->ofere,'ofers'=>$row->ofers,'oferz'=>$row->oferz,'ventam'=>$row->ventam,'ventad'=>$row->ventad,'ventas'=>$row->ventas,'ventak'=>$row->ventak,'ventac'=>$row->ventac,'ventaz'=>$row->ventaz,'st'=>$row->st,'existen'=>$row->existen);
+                $data[]=array('clave'=>$row->clave,'descr'=>$row->descr,'st'=>$row->st);
                 }
     return $data;    
 }else{return 'DEBE SELECCIONAR UNA COMPAÑIA';}
