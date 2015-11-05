@@ -59,6 +59,13 @@ var $codesta;
 					return $dataClientes;    	
 }//fin de la funcion de obtener clientes
 
+    function get_vendedores_dideco(){
+        $this->load->database('dideco',TRUE);
+        $query=$this->db->query("SELECT `cod`,`nombre` FROM `maeven` WHERE `banvend` LIKE 'S'");
+        return $query->result_array();
+    }
+
+
 function get_cliente($codCte='')
 {
 	$this->load->database($this->txtcompa,TRUE);
