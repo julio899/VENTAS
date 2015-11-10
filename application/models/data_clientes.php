@@ -3,7 +3,7 @@
 class Data_clientes extends CI_Model {
 
 function get_clientes(){
-$this->load->database('compacto',TRUE);
+$this->load->database('dideco',TRUE);
 //$sql="SELECT * FROM `01_cpc` WHERE `zona`<90";
 $sql="SELECT `ciudades`.`nombre`,`estados`.`estado`,`01_cpc`.* FROM `01_cpc`,`ciudades`,`estados` WHERE `zona`<90 AND `01_cpc`.`codciud`= `ciudades`.`codciud` AND `ciudades`.`codesta`=`estados`.`codesta`"; //SELECT `ciudades`.`nombre`, `razsoc` FROM `01_cpc`,`ciudades` WHERE `01_cpc`.`codciud`= `ciudades`.`codciud`
 $query=$this->db->query($sql);
@@ -20,6 +20,12 @@ return $datos;
         $this->load->database('dideco',TRUE);
         $query=$this->db->query("SELECT `cod`,`nombre` FROM `maeven` WHERE `banvend` LIKE 'S'");
         return $query->result_array();
+    }
+    function get_direccion_fiscal_001($codcte){
+        $this->load->database('dideco',TRUE);
+        $query=$this->db->query("SELECT `dirent1`,`dirent2`,`dirent3` FROM `pftpuen` WHERE `codclie` LIKE '$codcte'");
+        return $query->result_array();
+
     }
 
 }

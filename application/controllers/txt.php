@@ -8,6 +8,7 @@ class Txt extends CI_Controller {
 		$datos=null;
 		$this->load->model('data_clientes');
 		header('Content-type: application/json');
+		//header("Content-Type: text/plain");
 		//`razsoc`,`rif`,`telef`,`direc1`
 		$clientes=$this->data_clientes->get_clientes();
 		$contador=0;
@@ -46,8 +47,19 @@ class Txt extends CI_Controller {
 				} else {
 				  $contador++;  $temporal[]=$rif_formateado;
 					//echo "$contador - $rif_formateado $value->razsoc \t$value->rif \t\t\tActivo $telefono \t00001 N \t\t\tN\n";
-					$datos[]=array('rif' => $rif_formateado,'razsoc'=>$value->razsoc,'telefono'=>$telefono,'direccion'=>trim($value->direc1." ".$value->direc2),"ciudad"=>$value->nombre,"estado"=>$value->estado  );
-				}
+					
+					/*		  	$di=$this->data_clientes->get_direccion_fiscal_001($value->codcte);
+							  	$direccion_=null;
+				  	if(count ($di)===0){
+				  			 $direccion_fiscal=trim($value->direc1." ".$value->direc2);
+				  			 }
+				  	if(count($di)>0){
+				  			 	$direccion_=$di['dirent1']." ".$di['dirent2']." ".$di['dirent3'];
+				  			 }
+				  			 //echo count($di);
+				  			 var_dump( $di ); exit();
+					$datos[]=array('rif' => $rif_formateado,'razsoc'=>$value->razsoc,'telefono'=>$telefono,'direccion'=>trim($value->direc1." ".$value->direc2),"ciudad"=>$value->nombre,"estado"=>$value->estado,"ruta"=>$value->ruta,"zona"=>$value->zona,"nomfir"=>$value->nomfir  );
+				}*/
 
 			}//fin de IF !=0000000000 y si la primera letra no comienza con C de CI
 		}//fin de foreach
@@ -55,9 +67,11 @@ $arreglo_unico=array_unique($temporal);
 $unicos=$this->unique_multidim_array($datos,'rif');
 //echo "solo elementos validos: ".count($arreglo_unico);
 //echo "\nen datos existen elementos validos: ".count($unicos)."\n";
+$solo=0;
 				foreach ($unicos as $key => $value) {
 					// echo $value['rif']."\t".$value['razsoc']." \t".$value['rif']."\t\t\t\tActivo\t".$value['telefono']."\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['estado']."\t"."No Asignado\t00001\tN\t\t\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";
-					if(strtoupper($value['ciudad'])=='MARACAY' ):
+					if(strtoupper($value['ciudad'])=='MARACAY' && $value['zona']!='11'):
+								/*
 								#Ahora en CSV por ;
 								echo $value['rif'].";";
 								echo $value['razsoc'].";";
@@ -84,7 +98,30 @@ $unicos=$this->unique_multidim_array($datos,'rif');
 								echo "0;";//Nivel de precio
 								echo "1;";//Origen del cliente 0=origen del cliente factura / 1=origen manual
 								echo date("d/m/Y")."\n";//fecha de creacion del cliente
-								
+								*/
+								$zona=''; 
+								if($value['zona']=='01'){ 
+															$zona='11'; 
+														}else{
+																$zona=$value['zona'];
+														}
+								if($solo<10){					
+								//echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."	".$value['ciudad']."		".$value['ruta']."	No Asignado	000".$zona."	N				N			0	0	".date("d/m/Y")."
+								//";
+										$telefono=str_replace(";", "/", $value['telefono']);
+										# Punto y coma 1
+											//echo $value['rif'].";".$value['razsoc'].";".$value['rif'].";;;;Activo;$telefono;;".$value['direccion'].";".$value['ciudad'].";;".$value['ruta'].";SUPERMERCADOS;000".$zona.";N;s_marvie@hotmail.com;SANDRA VIEIRA;;N;;;0;1;".date("d/m/Y")."\n";
+										# tab 1
+										//echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000".$zona."\tN\ts_marvie@hotmail.com\tSANDRA VIEIRA\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";
+										if( strlen($zona)==2 ){
+										//echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000".$zona."\tN\tcorreo@gmail.com\t".$value['nomfir']."\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";
+										$zona="000".$zona;
+										echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."(Ruta:".$value['ruta'].")"."	".$value['ciudad']."		".$value['ruta']."	SUPERMERCADOS	$zona	N	correo@gmail.com	".$value['nomfir']."		N			0	1	09/11/2015\n";
+										//echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."	".$value['ciudad']."		".$value['ruta']."	SUPERMERCADOS	000".$zona."	N				N			0	1	10/11/2015\n";
+										//NO echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000$zona\tN\t*\t".$value['nomfir']."\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";	
+										}
+								$solo++;		
+								}//solo tantos registros
 					endif;
 				}
 
@@ -108,10 +145,12 @@ public function unique_multidim_array($array, $key){
 public function vendedores_001(){
  $this->load->model('data_clientes');
  $vendedores= $this->data_clientes->get_vendedores_dideco();
- 	echo "<pre>VENDEDORES DE DIDECO</pre>";
+ header('Content-type: application/json');
  	foreach ($vendedores as $key => $value) {
- 		echo "COD: ".$value['cod'];
- 		echo " / ".$value['nombre']."<br>";
+ 		//echo "000".$value['cod'].";".$value['nombre'].";000".$value['cod'].";ACT;;MARACAY;;;;;;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;N;N;;;;;";
+ 		echo "000".$value['cod']."	".$value['nombre']."	V-00000000-0	ACT	direccion	MARACAY		0243-2710000	FAX	CORREO@GMAIL.COM	NOTA	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	N	N					
+";
+
  	}
 }
 
