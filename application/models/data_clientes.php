@@ -28,4 +28,41 @@ return $datos;
 
     }
 
+
+function get_tipo_neg_001($tip_neg){
+	$this->load->database('dideco',TRUE);
+	$query=$this->db->query("SELECT `nombre` FROM `tabneg` WHERE `neg` LIKE '$tip_neg'");
+    return $query->result_array();
+}
+
+
+function unique_multidim_array($array, $key){
+    $temp_array = array();
+    $i = 0;
+    $key_array = array();
+
+    foreach($array as $val){
+        if(!in_array($val[$key],$key_array)){
+            $key_array[$i] = $val[$key];
+            $temp_array[$i] = $val;
+        }
+        $i++;
+    }
+    return $temp_array;
+}
+
+function vendedores_001(){
+ $this->load->model('data_clientes');
+ $vendedores= $this->data_clientes->get_vendedores_dideco();
+ header('Content-type: application/json');
+ 	foreach ($vendedores as $key => $value) {
+ 		//echo "000".$value['cod'].";".$value['nombre'].";000".$value['cod'].";ACT;;MARACAY;;;;;;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;N;N;;;;;";
+ 		echo "000".$value['cod']."	".$value['nombre']."	V-00000000-0	ACT	direccion	MARACAY		0243-2710000	FAX	CORREO@GMAIL.COM	NOTA	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	N	N					
+";
+
+ 	}
+}//fin de vendedores_001()
+
+
+
 }

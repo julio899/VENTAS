@@ -48,29 +48,24 @@ class Txt extends CI_Controller {
 				  $contador++;  $temporal[]=$rif_formateado;
 					//echo "$contador - $rif_formateado $value->razsoc \t$value->rif \t\t\tActivo $telefono \t00001 N \t\t\tN\n";
 					
-					/*		  	$di=$this->data_clientes->get_direccion_fiscal_001($value->codcte);
-							  	$direccion_=null;
-				  	if(count ($di)===0){
-				  			 $direccion_fiscal=trim($value->direc1." ".$value->direc2);
-				  			 }
-				  	if(count($di)>0){
-				  			 	$direccion_=$di['dirent1']." ".$di['dirent2']." ".$di['dirent3'];
-				  			 }
-				  			 //echo count($di);
-				  			 var_dump( $di ); exit();
-					$datos[]=array('rif' => $rif_formateado,'razsoc'=>$value->razsoc,'telefono'=>$telefono,'direccion'=>trim($value->direc1." ".$value->direc2),"ciudad"=>$value->nombre,"estado"=>$value->estado,"ruta"=>$value->ruta,"zona"=>$value->zona,"nomfir"=>$value->nomfir  );
-				}*/
+							$datos[]=array('rif' => $rif_formateado,'razsoc'=>$value->razsoc,'telefono'=>$telefono,'direccion'=>trim($value->direc1." ".$value->direc2),"ciudad"=>$value->nombre,"estado"=>$value->estado,"ruta"=>$value->ruta,"zona"=>$value->zona,"nomfir"=>$value->nomfir,"codcte"=>$value->codcte,"tipneg"=>$value->tipneg,"ciuest"=>$value->ciuest  );
+				}
 
 			}//fin de IF !=0000000000 y si la primera letra no comienza con C de CI
 		}//fin de foreach
 $arreglo_unico=array_unique($temporal);
-$unicos=$this->unique_multidim_array($datos,'rif');
+$unicos=$this->data_clientes->unique_multidim_array($datos,'rif');
 //echo "solo elementos validos: ".count($arreglo_unico);
 //echo "\nen datos existen elementos validos: ".count($unicos)."\n";
 $solo=0;
 				foreach ($unicos as $key => $value) {
 					// echo $value['rif']."\t".$value['razsoc']." \t".$value['rif']."\t\t\t\tActivo\t".$value['telefono']."\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['estado']."\t"."No Asignado\t00001\tN\t\t\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";
-					if(strtoupper($value['ciudad'])=='MARACAY' && $value['zona']!='11'):
+					
+
+					//if(strtoupper($value['ciudad'])=='MARACAY' && $value['zona']!='11'):
+					if($value['zona']!='11'):
+					
+
 								/*
 								#Ahora en CSV por ;
 								echo $value['rif'].";";
@@ -105,7 +100,24 @@ $solo=0;
 														}else{
 																$zona=$value['zona'];
 														}
-								if($solo<10){					
+
+
+
+
+								//SOLO if($solo<1000){		
+								if($value['zona']=='13'){		
+								$di=$this->data_clientes->get_direccion_fiscal_001($value['codcte']);
+								 $direccion_fiscal="";
+					  			 if(count($di)>0){
+						  			 	$direccion_fiscal=$di[0]['dirent1']." ".$di[0]['dirent2']." ".$di[0]['dirent3']." * ".$value['ciuest']." (Ruta:".$value['ruta'].") / Despacho: ".$value['direccion'];
+					  			 }else{ 
+					  			 		$direccion_fiscal = $value['direccion']." * ".$value['ciuest']." (Ruta:".$value['ruta'].")" ;
+					  			 	 }
+
+					  			// echo "\n\n\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * \n"; 
+						  		//	 echo "\nDireccion Fiscal: ".$direccion_fiscal."\n\n";
+					  			// var_dump( $di ); exit();
+											
 								//echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."	".$value['ciudad']."		".$value['ruta']."	No Asignado	000".$zona."	N				N			0	0	".date("d/m/Y")."
 								//";
 										$telefono=str_replace(";", "/", $value['telefono']);
@@ -116,14 +128,17 @@ $solo=0;
 										if( strlen($zona)==2 ){
 										//echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000".$zona."\tN\tcorreo@gmail.com\t".$value['nomfir']."\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";
 										$zona="000".$zona;
-										echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."(Ruta:".$value['ruta'].")"."	".$value['ciudad']."		".$value['ruta']."	SUPERMERCADOS	$zona	N	correo@gmail.com	".$value['nomfir']."		N			0	1	09/11/2015\n";
+										$tipo_neg=$this->data_clientes->get_tipo_neg_001($value['tipneg']);
+										$tipo_negocio = substr(trim($tipo_neg[0]['nombre']), 0,20)  ;
+										echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$direccion_fiscal."	".$value['ciudad']."		".$value['ruta']."	".$tipo_negocio."	$zona	N	correo@gmail.com	".$value['nomfir']."		N			0	1	09/11/2015\n";
 										//echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."	".$value['ciudad']."		".$value['ruta']."	SUPERMERCADOS	000".$zona."	N				N			0	1	10/11/2015\n";
 										//NO echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000$zona\tN\t*\t".$value['nomfir']."\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";	
 										}
-								$solo++;		
-								}//solo tantos registros
+								}//si la zona es
+								//$solo++;		
+								//SOLO	}//solo tantos registros
 					endif;
-				}
+				}//fin de foreach
 
 	}//fin de funcion Index()
 
