@@ -7,7 +7,9 @@ class Txt extends CI_Controller {
 		$arreglo_unico=null;
 		$datos=null;
 		$this->load->model('data_clientes');
-		header('Content-type: application/json');
+		//header('Content-type: application/json');
+		header('Content-Encoding: UTF-8');
+		header('Content-Type: text/plain; charset=utf-8');
 		//header("Content-Type: text/plain");
 		//`razsoc`,`rif`,`telef`,`direc1`
 		$clientes=$this->data_clientes->get_clientes();
@@ -105,7 +107,7 @@ $solo=0;
 
 
 								//SOLO if($solo<1000){		
-								if($value['zona']=='13'){		
+								if($value['zona']=='45'){		
 								$di=$this->data_clientes->get_direccion_fiscal_001($value['codcte']);
 								 $direccion_fiscal="";
 					  			 if(count($di)>0){
@@ -130,7 +132,7 @@ $solo=0;
 										$zona="000".$zona;
 										$tipo_neg=$this->data_clientes->get_tipo_neg_001($value['tipneg']);
 										$tipo_negocio = substr(trim($tipo_neg[0]['nombre']), 0,20)  ;
-										echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$direccion_fiscal."	".$value['ciudad']."		".$value['ruta']."	".$tipo_negocio."	$zona	N	correo@gmail.com	".$value['nomfir']."		N			0	1	09/11/2015\n";
+										echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$direccion_fiscal."	".$value['ciudad']."		".$value['ruta']."	".$tipo_negocio."	$zona	N	correo@gmail.com	".$value['nomfir']."		N			0	1	09/11/2015\r\n";
 										//echo $value['rif']."	".$value['razsoc']."	".$value['rif']."				Activo	".$value['telefono']."		".$value['direccion']."	".$value['ciudad']."		".$value['ruta']."	SUPERMERCADOS	000".$zona."	N				N			0	1	10/11/2015\n";
 										//NO echo $value['rif']."\t".$value['razsoc']."\t".$value['rif']."\t\t\t\tActivo\t$telefono\t\t".$value['direccion']."\t".$value['ciudad']."\t\t".$value['ruta']."\tSUPERMERCADOS\t000$zona\tN\t*\t".$value['nomfir']."\t\tN\t\t\t0\t1\t".date("d/m/Y")."\n";	
 										}
