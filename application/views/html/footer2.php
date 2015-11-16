@@ -79,7 +79,7 @@ $("h1").html(data[0].descr);
 });*/
 
 $.ajax({
-            'async': false,
+            'async': true,
             'global': false,
             'url': url_json,
             'dataType': "json",

@@ -24,7 +24,7 @@ return $compaTXT;
 function get_proveedores($CodCompa=''){
 $data=NULL;
  $this->load->database($this->get_compaTXT($CodCompa),TRUE);
-    $query=$this->db->query("SELECT * FROM  `01_cpp` WHERE `st` LIKE 'A'");
+    $query=$this->db->query("SELECT * FROM  `01_cpp` WHERE `ina` LIKE 'A'");
     //$query=$this->db->query("SELECT * FROM  `01_cpp`");
             foreach ($query->result() as $row)
                 {

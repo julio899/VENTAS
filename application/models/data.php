@@ -95,7 +95,7 @@ function get_ciudad_estado($codciudad,$codestado){
 
 function get_proveedores(){
  $this->load->database($this->txtcompa,TRUE);
-    $query=$this->db->query("SELECT * FROM  `01_cpp` WHERE `st` LIKE 'A'");
+    $query=$this->db->query("SELECT * FROM  `01_cpp` WHERE `ina` LIKE 'A'");
             foreach ($query->result() as $row)
                 {
                    $data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);
