@@ -74,10 +74,9 @@
 								</thead>
 									<?php
 										$productos=$pedido_completo['productos'];
-										for ($i=0; $i < count($productos); $i++) { 
-											//var_dump($productos[$i]);
-											echo "<tr><td>".($i+1)."</td><td>".$productos[$i]['codpro']."</td><td>".$productos[$i]['descr']."</td><td>".$productos[$i]['cantidad']."</td></tr>";
-										}
+										for ($i=0; $i < count($productos); $i++) {
+												echo "<tr><td>".($i+1)."</td><td>".$productos[$i]['codpro']."</td><td>".$productos[$i]['descr']."</td><td>".$productos[$i]['cantidad']."</td></tr>";							
+										}// Fin del For
 									?>
 								</table>
 			

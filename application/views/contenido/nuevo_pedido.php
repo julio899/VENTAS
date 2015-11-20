@@ -58,7 +58,7 @@ if(isset($proveedores)){
 
 						<div id="pedido">
 							<table id="tabla" class="hoverable">
-								<thead><tr><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th></tr></thead> 
+								<thead><tr><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th><th>OPCIONES</th></tr></thead> 
 								<tbody></tbody>
 							</table>
 								

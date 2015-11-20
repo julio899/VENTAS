@@ -66,6 +66,8 @@ $datauser=$this->session->userdata('datos_usuario');
 var tabla=$('#tabla');
 var tablallena=new Array();
 
+
+
       $('#proveedores').on('change', function() {
 
         //Armo la URL que me generara el Json de los productos para ese proveedor
@@ -104,12 +106,11 @@ $.ajax({
          $(".button-collapse").sideNav();
          $('.modal-trigger').leanModal();
 
-  $('.button-collapse').sideNav({
-      menuWidth: 280, // Default is 240
-    });
+          $('.button-collapse').sideNav({
+              menuWidth: 280, // Default is 240
+            });
 
-
-
+         
 
       });
 
@@ -124,7 +125,7 @@ function cargar(){
               if(codProveedor!=null||codProveedor==0){
 
                                   if(cantidad!=null && cantidad>0){
-                                          $('table#tabla > tbody').append('<tr><td>'+codProveedor+'</td><td>'+descripcion+'</td><td>'+cantidad+'</td></tr>');
+                                          $('table#tabla > tbody').append('<tr><td>'+codProveedor+'</td><td>'+descripcion+'</td><td>'+cantidad+'</td><td> <i class="material-icons dp48 x" onClick="borrar()" >clear</i> </td></tr>');
                                           $('#cantidad').val('');
                     
                     
@@ -134,6 +135,10 @@ function cargar(){
               }else{alert('SELECCIONE UN PROVEEDOR');}
               
 }/*fin de la funcion cargar*/
+
+function borrar(){  
+  console.log("eliminar_producto");
+}
 
 function finalizarPedido(){
   var tipo=$('#tipo').val();
@@ -222,6 +227,16 @@ function detalle_pedido() {
                }
         });/*fin del Ajax para pedido*/
 }
+
+
+$(document).on("click",".x",function(){
+    var parent = $(this).parents().parents().get(0);
+    
+        if(confirm("Seguro de BORRAR el producto")){
+            $(parent).remove();      
+            console.log("iten borrado");
+        }
+  });
       </script>
 </body>
 </html>

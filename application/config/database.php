@@ -49,8 +49,8 @@ $active_group = 'default';
 $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'grupoemp_ventas';
-$db['default']['password'] = 'Dideco.123';
+$db['default']['username'] = 'grupoemp';
+$db['default']['password'] = 'D9662455.';
 $db['default']['database'] = 'grupoemp_ventas';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
@@ -67,8 +67,8 @@ $db['default']['stricton'] = FALSE;
 
 
 $db['dideco']['hostname'] = 'localhost';
-$db['dideco']['username'] = 'grupoemp_ventas';
-$db['dideco']['password'] = 'Dideco.123';
+$db['dideco']['username'] = 'grupoemp';
+$db['dideco']['password'] = 'D9662455.';
 $db['dideco']['database'] = 'grupoemp_sql_dideco';
 $db['dideco']['dbdriver'] = 'mysql';
 $db['dideco']['dbprefix'] = '';
@@ -84,8 +84,8 @@ $db['dideco']['stricton'] = FALSE;
 
 
 $db['deimport']['hostname'] = 'localhost';
-$db['deimport']['username'] = 'grupoemp_ventas';
-$db['deimport']['password'] = 'Dideco.123';
+$db['deimport']['username'] = 'grupoemp';
+$db['deimport']['password'] = 'D9662455.';
 $db['deimport']['database'] = 'grupoemp_sql_deimport';
 $db['deimport']['dbdriver'] = 'mysql';
 $db['deimport']['dbprefix'] = '';
@@ -101,8 +101,8 @@ $db['deimport']['stricton'] = FALSE;
 
 
 $db['compacto']['hostname'] = 'localhost';
-$db['compacto']['username'] = 'grupoemp_ventas';
-$db['compacto']['password'] = 'Dideco.123';
+$db['compacto']['username'] = 'grupoemp';
+$db['compacto']['password'] = 'D9662455.';
 $db['compacto']['database'] = 'grupoemp_sql_compacto';
 $db['compacto']['dbdriver'] = 'mysql';
 $db['compacto']['dbprefix'] = '';
