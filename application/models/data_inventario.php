@@ -38,19 +38,11 @@ $data=NULL;
                 }else{
                         if($row->codigo=='027'||$row->codigo=='013'||$row->codigo=='040'||$row->codigo=='002'){
 
-                            $data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);
+                            //$data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);
                  
                         }
                     } 
 
-         
-                
-/*
-            if(isset($row->codigo)){
-                    if($row->codigo!='007'&&$row->codigo!='555'&&$row->codigo!='551'&&$row->codigo!='507'&&$row->codigo!='405'&&$row->codigo!='005'&&$row->codigo!='035'){
-                        $data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);                     
-                    }
-            }*/
 
             }//fin del for
                 

@@ -47,8 +47,8 @@ public function imp_talonario_pedidos($compa=''){
 		$pdf->configuracionMenbrete($compa);
 
 			$proveedores=$this->data_inventario->get_proveedores($compa);
-			$proveedores002=$this->data_inventario->get_proveedores('002');
-			$proveedores001=$this->data_inventario->get_proveedores('001');
+			//$proveedores002=$this->data_inventario->get_proveedores('002');
+			//$proveedores001=$this->data_inventario->get_proveedores('001');
 
 		
 		$datosTabla=null;
