@@ -31,7 +31,7 @@ $data=NULL;
                 	/*EXCLUIR PROVEEDORES AQUI*/
                if($CodCompa!='001'){
                     //ANTES if($row->codigo!='007'&&$row->codigo!='555'&&$row->codigo!='551'&&$row->codigo!='507'&&$row->codigo!='405'&&$row->codigo!='005'&&$row->codigo!='035'){
-                    if($row->codigo!='007'&&$row->codigo!='555'&&$row->codigo!='152'&&$row->codigo!='507'&&$row->codigo!='551'){
+                    if($row->codigo!='007'&&$row->codigo!='010'&&$row->codigo!='555'&&$row->codigo!='152'&&$row->codigo!='507'&&$row->codigo!='551'){
                             $data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);
                         }
                  //FIN DE SI NO ES DIDECO       
