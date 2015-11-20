@@ -45,13 +45,6 @@ $data=NULL;
                     } 
 
          
-                
-/*
-            if(isset($row->codigo)){
-                    if($row->codigo!='007'&&$row->codigo!='555'&&$row->codigo!='551'&&$row->codigo!='507'&&$row->codigo!='405'&&$row->codigo!='005'&&$row->codigo!='035'){
-                        $data[]=array('codcia'=>$row->codcia,'codigo'=>$row->codigo,'razsoc'=>$row->razsoc);                     
-                    }
-            }*/
 
             }//fin del for
                 
@@ -142,7 +135,14 @@ return $data;
 
 function get_productos_proveedor($CodCompa='',$codpro=''){
 
-    $sql="SELECT  `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`oferm`, `01_inv`.`oferd`, `01_inv`.`ofere`, `01_inv`.`ofers`, `01_inv`.`oferz`,`01inv`.`ventam`,`01inv`.`ventad`,`01inv`.`ventas`,`01inv`.`ventak`,`01inv`.`ventac`,`01inv`.`ventaz`,`01inv`.`existen`, `01_inv`.`st` FROM  `01_inv` ,  `01inv` WHERE  `01_inv`.`clave` LIKE  '$codpro%' AND  `01inv`.`clave` LIKE  `01_inv`.`clave` AND  `01_inv`.`st` LIKE  'A' ORDER BY  `01_inv`.`descr` ASC";
+    //OEM  $sql="SELECT  `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`oferm`, `01_inv`.`oferd`, `01_inv`.`ofere`, `01_inv`.`ofers`, `01_inv`.`oferz`,`01inv`.`ventam`,`01inv`.`ventad`,`01inv`.`ventas`,`01inv`.`ventak`,`01inv`.`ventac`,`01inv`.`ventaz`,`01inv`.`existen`, `01_inv`.`st` FROM  `01_inv` ,  `01inv` WHERE  `01_inv`.`clave` LIKE  '$codpro%' AND  `01inv`.`clave` LIKE  `01_inv`.`clave` AND  `01_inv`.`st` LIKE  'A' ORDER BY  `01_inv`.`descr` ASC";
+    $sql="SELECT `01_inv`.`clave` , `01_inv`.`descr` , `01_inv`.`oferm` , `01_inv`.`oferd` , `01_inv`.`ofere` , `01_inv`.`ofers` , `01_inv`.`oferz` , `01inv`.`ventam` , `01inv`.`ventad` , `01inv`.`ventas` , `01inv`.`ventak` , `01inv`.`ventac` , `01inv`.`ventaz` , `01inv`.`existen` , `01_inv`.`st`
+FROM `01_inv` , `01inv`
+WHERE `01_inv`.`clave` LIKE '$codpro%'
+AND `01inv`.`clave` LIKE `01_inv`.`clave`
+AND `01_inv`.`st` LIKE 'A'
+GROUP BY `01inv`.`clave`
+ORDER BY `01_inv`.`descr` ASC ";
  $this->load->database($this->get_compaTXT($CodCompa),TRUE);
     $query=$this->db->query($sql);
             $data=array();
