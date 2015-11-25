@@ -5,6 +5,13 @@ public $temporal;
 public $query;
 public $data;
 
+function get_fac_ventas_dideco($mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
+    $query=$this->db->query($sql);
+    return $query->result_array();
+}//fin de get_fac_ventas
+
 function get_vendedores(){
 $sql="SELECT * FROM `usuariosventas` WHERE `ciudad` NOT LIKE '' AND `nombre` NOT LIKE '' AND `tipo` LIKE 'V' ORDER BY `usuariosventas`.`nombre` ASC";
 $query=$this->db->query($sql);
@@ -196,6 +203,18 @@ function todos_pedidos(){
 return $this->temporal;
 }//todos_pedidos
 
+
+function pedidos_por_procesar(){
+    $sql="SELECT  * FROM  `pedidos` WHERE `pedidos`.`status` LIKE 'A' ORDER BY  `pedidos`.`fecha` DESC";
+    $this->load->database('default',TRUE);
+    $query=$this->db->query($sql);  
+        foreach ($query->result() as $row)
+                {
+                    $this->temporal[]=array('id'=>$row->id,'compa'=>$row->compa,'nombre_completo'=>$row->nombre_completo,'zona'=>$row->zona,'codcte'=>$row->codcte,'fecha'=>$row->fecha,'nota'=>$row->nota,'status'=>$row->status,'tipo'=>$row->tipo);
+                }         
+return $this->temporal;
+}//pedidos_por_procesar
+
 function pedidos_desde_hasta($desde,$hasta){
     $sql="SELECT  * FROM  `pedidos` WHERE `pedidos`.`id`>='$desde' AND `pedidos`.`id`<='$hasta' ORDER BY  `pedidos`.`fecha` DESC";
     $this->load->database('default',TRUE);
@@ -205,7 +224,7 @@ function pedidos_desde_hasta($desde,$hasta){
                     $this->temporal[]=array('id'=>$row->id,'compa'=>$row->compa,'nombre_completo'=>$row->nombre_completo,'zona'=>$row->zona,'codcte'=>$row->codcte,'fecha'=>$row->fecha,'nota'=>$row->nota,'status'=>$row->status,'tipo'=>$row->tipo);
                 }         
 return $this->temporal;
-}//todos_pedidos
+}//pedidos_desde_hasta
 
 function cantidad_pedidos_nuevos(){
 $sql="SELECT `id` FROM `grupoemp_ventas`.`pedidos` WHERE `status` LIKE 'A'";

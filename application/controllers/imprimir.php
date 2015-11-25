@@ -28,6 +28,147 @@ public function procesos_productos($proveedores,$datosTabla,$compa){
 	return $datosTabla;
 }//proceso de recorrer los productos
 
+public function txt_mes($n_mes){
+	$txt="";
+	switch ($n_mes) {
+		case '1':
+			$txt="ENERO";
+			break;
+		case '01':
+			$txt="ENERO";
+			break;
+		case '2':
+			$txt="FEBRERO";
+			break;
+		case '02':
+			$txt="FEBRERO";
+			break;
+		case '3':
+			$txt="MARZO";
+			break;
+		case '03':
+			$txt="MARZO";
+			break;
+		case '4':
+			$txt="ABRIL";
+			break;
+		case '04':
+			$txt="ABRIL";
+			break;
+		case '05':
+			$txt="MAYO";
+			break;
+		case '5':
+			$txt="MAYO";
+			break;
+		case '06':
+			$txt="JUNIO";
+			break;
+		case '6':
+			$txt="JUNIO";
+			break;
+		case '07':
+			$txt="JULIO";
+			break;
+		case '7':
+			$txt="JULIO";
+			break;
+		case '08':
+			$txt="AGOSTO";
+			break;
+		case '8':
+			$txt="AGOSTO";
+			break;
+		case '09':
+			$txt="SEPTIEMBRE";
+			break;
+		case '9':
+			$txt="SEPTIEMBRE";
+			break;
+		case '10':
+			$txt="OCTUBRE";
+			break;
+		case '11':
+			$txt="NOVIEMBRE";
+			break;
+		case '12':
+			$txt="DICIEMBRE";
+			break;
+		
+		default:
+			# code...
+			break;
+	}
+		return $txt;
+}//fin de txt_mes
+
+public function menbrete_fac_ventas($pdf,$mes,$year){
+	#Establecemos los márgenes izquierda, arriba y derecha:
+		$pdf->SetMargins(5,5,5);
+
+	$razon="Mayorista de Confites y Viveres ( DIDECO, C.A.";
+	$rif="J075168089";
+	# MENBRETE
+		#fuente
+		$pdf->SetFont('Arial','IB',12);
+    $pdf->Cell(0,5,$razon.' - '.$rif.' )',0,0,'C');
+    	$pdf->SetFont('Arial','I',9);
+    	$pdf->Ln();
+    $pdf->Cell(0,4,'Libro de Ventas',0,0,'C');
+    	$pdf->Ln();
+    $pdf->Cell(0,4,$this->txt_mes($mes).' - '.$year,0,0,'C');
+    	$pdf->Ln();
+    $pdf->Cell(0,3,'Emitido el '.date('d/m/Y h:i A'),0,0,'C');
+
+		$pdf->Setx(5);
+    		$pdf->Cell(0,5,'FECHA     NRO. DOCUMENT     Nro CONTROL     MODO PAGO',0,0,'L'); $pdf->Ln();
+
+}
+
+public function pie_pag($pdf){
+
+	//El Numero de Pagina		
+		#fuente
+		$pdf->SetFont('Arial','I',8);
+		$pdf->SetY(185);
+		$pdf->Setx(335);
+    	$pdf->Cell(10,10,'Pagina '.$pdf->PageNo().'/{nb}',0,0,'C');$pdf->Ln();
+}
+
+public function imp_fac_ventas_dideco($mes="",$year=""){
+	$this->load->helper('pdf');
+	$this->load->model('data_complemento');
+	$fac_compras=$this->data_complemento->get_fac_ventas_dideco($mes,$year);
+	$pdf = new PDF('L','mm','Legal');
+	$pdf->AliasNbPages();
+	$pdf->AddPage();
+	$this->menbrete_fac_ventas($pdf,$mes,$year);
+
+		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO'); 
+		$datos[]=null;
+    	//$datos[]=array(1,2,3,4,5,6);
+    	//$datos[]=array(1,2,3,4,5,6);
+    	
+    	foreach ($fac_compras as $key => $value) {
+    		if ($pdf->GetY() >180.00125 ){ $this->pie_pag($pdf); $this->menbrete_fac_ventas($pdf,$mes,$year);  }
+    		$modo_pago='CONTADO';
+    		if($value['condi']==1){ $modo_pago='CREDITO'; }
+    		//$pdf->Cell(0,5,$value['fecemi'].'       '.$value['numdoc'].'                      '.$value['control'].'       '.$modo_pago.$value['condi'],0,0,'L'); $pdf->Ln();
+    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,5,6);
+    	}
+    	$pdf->Tabla_fac_ventas($header, $datos);
+    	$pdf->Setx(5);
+	
+		
+
+
+		$pdf->AliasNbPages();
+		$pdf->Output();
+
+
+
+}//imp_fac_ventas
+
 public function imp_talonario_pedidos($compa=''){
 	 $this->load->helper('pdf');
 	 $this->load->model('data_inventario');

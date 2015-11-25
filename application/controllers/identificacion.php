@@ -73,6 +73,10 @@ class Identificacion extends CI_Controller {
 				# En Caso de Ser Facturador
 				redirect('facturacion');
 				break;
+			case 'E':
+				# En Caso de Ser SUPERVISION
+				redirect('editor');
+				break;
 			case 'C':
 				# En Caso de Ser Consultor
 				break;

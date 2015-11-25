@@ -1,4 +1,9 @@
+		<!-- <pre><?php var_dump($this->session->userdata('datos_usuario')['tipo'] );?></pre> -->
+		<?php 
+					$usuario=$this->session->userdata('datos_usuario');
+		 ?>
 		<div class="row">
+
 		<?php if(isset($pedido_completo)):?>
 			<div class="col s4">
 					<?php 	
@@ -7,12 +12,17 @@
 			</div>
 			<div class="col s4">
 					<?php
-					$usuario=$this->session->userdata('datos_usuario');
 					if ($usuario['tipo']=='F') {
 						# en caso que sea supervisor o Facturador
 						echo '<a class="btn orange" href="'.base_url().index_page().'/facturacion" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
 					
-					}else{
+					}
+					if ($usuario['tipo']=='E') {
+						# en casoq eu sea un EDITOR
+						echo '<a class="btn orange" href="'.base_url().index_page().'/editor" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
+						
+					}
+					if($usuario['tipo']=='V'){
 						# en casoq eu sea un vendedor
 						echo '<a class="btn orange" href="'.base_url().index_page().'/ventas/pedidos_enviados" title="Regresar"><i class="mdi-content-reply"></i> Regresar</a>';
 					
@@ -29,6 +39,10 @@
 					      	}else{
 						    		echo '<a class="btn" href="'.base_url().index_page().'/ventas/detallar_pedido/'.(($pedido_completo['cabecera']['id'])+1).'" title="Siguiente Pedido"><i class="mdi-content-forward" title="Siguiente Pedido"></i> Siguiente Pedido</a>';
 					      	}
+
+					    if($usuario['tipo']=='E'){
+					    	echo '<a class="btn red accent-4" href="#" title="ANULAR">ANULAR <i class="mdi-content-clear"></i></a>';
+						}  	
 				?>
 			</div>
 		<?php endif;?>
@@ -70,12 +84,22 @@
 								
 								<table class="striped">
 								<thead>
-									<tr><th>Nro.</th><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th></tr>
+									<?php 
+									if($usuario['tipo']=='E'){
+										echo "<tr><th>Nro.</th><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th><th>OPCION</th></tr>";
+										}else{
+											echo "<tr><th>Nro.</th><th>CODIGO</th><th>DESCRIPCION</th><th>CANTIDAD</th></tr>";
+											} ?>
 								</thead>
 									<?php
 										$productos=$pedido_completo['productos'];
 										for ($i=0; $i < count($productos); $i++) {
-												echo "<tr><td>".($i+1)."</td><td>".$productos[$i]['codpro']."</td><td>".$productos[$i]['descr']."</td><td>".$productos[$i]['cantidad']."</td></tr>";							
+												if($usuario['tipo']=='E'){
+													#en caso que sea el usuario EDITOR coloco el campo Editable
+													echo "<tr><td>".($i+1)."</td><td>".$productos[$i]['codpro']."</td><td>".$productos[$i]['descr']."</td><td> <input type=\"number\" name=\"id_".$productos[$i]['codpro']."\" value=\"".$productos[$i]['cantidad']."\" min=\"1\" max=\"200\"></td><td><i class=\"material-icons dp48 x\" onclick=\"borrar()\">clear</i>".count($productos)."</td></tr>";							
+												}else{
+													echo "<tr><td>".($i+1)."</td><td>".$productos[$i]['codpro']."</td><td>".$productos[$i]['descr']."</td><td>".$productos[$i]['cantidad']."</td></tr>";																		
+												}
 										}// Fin del For
 									?>
 								</table>

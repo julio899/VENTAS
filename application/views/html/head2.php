@@ -106,6 +106,14 @@ ul#lateral-sup>li{
   }
 }
 
+.azul_txt_blanco{
+
+    color: #FFF !important;
+    background-color: #2196F3  !important;
+}
+span.badge.nuevo:after {
+    content: " nuevo";
+}
 </style>
 </head>
 <body>

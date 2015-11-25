@@ -275,6 +275,86 @@ if($u<$cantidad_lineas_primera_cols){
 }
 
 
+function Tabla_fac_ventas($header, $data)
+{
+    // Colors, line width and bold font
+    $this->SetFillColor(255,0,0);
+    $this->SetTextColor(255);
+    $this->SetDrawColor(128,0,0);
+    $this->SetLineWidth(.3);
+    $this->SetFont('','B',9);
+    // Header
+    $w = array(20, 22,30,22, 20,20);
+
+    $this->SetY(50);
+    $this->SetX(109);
+    for($i=0;$i<count($header);$i++){
+
+     $this->Cell($w[$i],6,$header[$i],1,0,'C',true);
+       }   
+    $this->Ln();
+    // Color and font restoration
+    $this->SetFillColor(224,235,255);
+    $this->SetTextColor(0);
+    $this->SetFont('');
+    // Data
+    $fill = false;
+    $u=0;
+
+$this->SetFont('Courier','',8);
+
+                    $x=109;
+
+                    //$this->SetY(32);
+                    //$this->SetX(0);
+                    
+    foreach($data as $row)
+    {
+       $u++;
+       $cantidad_lineas_primera_cols=0;
+        if($u==$cantidad_lineas_primera_cols){
+            // Closing line Primera tabla
+            $this->Cell(array_sum($w),0,'','T');
+            $this->SetX(109);
+            $this->cabeceraTabla2($header,$w,$x);
+        }
+        
+        if ($u>=$cantidad_lineas_primera_cols) {
+            $this->SetX($x);
+        }
+        //$this->SetX($x);
+
+        $this->Cell($w[0],4,$row[0],'LR',0,'C',$fill);
+        $this->Cell($w[1],4,$row[1],'LR',0,'C',$fill);
+        $this->Cell($w[2],4,$row[2],'LR',0,'C',$fill);
+        $this->Cell($w[3],4,$row[3],'LR',0,'C',$fill);
+        $this->Cell($w[4],4,$row[4],'LR',0,'C',$fill);
+        $this->Cell($w[5],4,$row[5],'LR',0,'C',$fill);
+        $this->Ln();
+
+        $fill = !$fill;
+    }
+
+
+
+
+
+            if($u<$cantidad_lineas_primera_cols){
+                //cierre de la primera tabla
+                $this->SetX(5);
+                // Closing line
+                $this->Cell(array_sum($w),0,'','T');
+            }else{
+
+                $this->SetX(109);
+                // Closing line ( SEGUNDA TABLA)
+                $this->Cell(array_sum($w),0,'','T');
+
+            }
+
+}
+
+
 
 function TableDideco($header, $data)
 {
