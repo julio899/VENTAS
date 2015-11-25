@@ -144,7 +144,7 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	$pdf->AddPage();
 	$this->menbrete_fac_ventas($pdf,$mes,$year);
 
-		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO'); 
+		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF'); 
 		$datos[]=null;
     	//$datos[]=array(1,2,3,4,5,6);
     	//$datos[]=array(1,2,3,4,5,6);
@@ -154,7 +154,7 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     		$modo_pago='CONTADO';
     		if($value['condi']==1){ $modo_pago='CREDITO'; }
     		//$pdf->Cell(0,5,$value['fecemi'].'       '.$value['numdoc'].'                      '.$value['control'].'       '.$modo_pago.$value['condi'],0,0,'L'); $pdf->Ln();
-    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,5,6);
+    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,'','','');
     	}
     	$pdf->Tabla_fac_ventas($header, $datos);
     	$pdf->Setx(5);

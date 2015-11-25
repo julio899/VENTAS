@@ -284,7 +284,7 @@ function Tabla_fac_ventas($header, $data)
     $this->SetLineWidth(.3);
     $this->SetFont('','B',9);
     // Header
-    $w = array(20, 22,30,22, 20,20);
+    $w = array(20, 22,30,22, 20,20,20);
 
     $this->SetY(50);
     $this->SetX(109);
@@ -330,6 +330,7 @@ $this->SetFont('Courier','',8);
         $this->Cell($w[3],4,$row[3],'LR',0,'C',$fill);
         $this->Cell($w[4],4,$row[4],'LR',0,'C',$fill);
         $this->Cell($w[5],4,$row[5],'LR',0,'C',$fill);
+        $this->Cell($w[5],4,$row[6],'LR',0,'C',$fill);
         $this->Ln();
 
         $fill = !$fill;
