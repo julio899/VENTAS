@@ -197,47 +197,47 @@ function TableFantacy($header, $data)
     $fill = false;
     $u=0;
 
-$this->SetFont('Courier','',8);
+    $this->SetFont('Courier','',8);
 
                     $x=109;
 
                     //$this->SetY(32);
                     //$this->SetX(0);
                     
-    foreach($data as $row)
-    {
-       $u++;
-       $cantidad_lineas_primera_cols=65;
-        if($u==$cantidad_lineas_primera_cols){
-            // Closing line Primera tabla
-            $this->Cell(array_sum($w),0,'','T');
-            $this->SetX(109);
-            $this->cabeceraTabla2($header,$w,$x);
+        foreach($data as $row)
+        {
+               $u++;
+               $cantidad_lineas_primera_cols=65;
+                if($u==$cantidad_lineas_primera_cols){
+                    // Closing line Primera tabla
+                    $this->Cell(array_sum($w),0,'','T');
+                    $this->SetX(109);
+                    $this->cabeceraTabla2($header,$w,$x);
+                }
+                
+                if ($u>=$cantidad_lineas_primera_cols) {
+                    $this->SetX($x);
+                }
+                //$this->SetX($x);
+
+                $this->Cell($w[0],4,$row[0],'LR',0,'C',$fill);
+                $this->Cell($w[1],4,'','LR',0,'C',$fill);
+                $this->Cell($w[2],4,$row[1],'LR',0,'C',$fill);
+                $this->Cell($w[3],4,$row[2],'LR',0,'L',$fill);
+                $this->Cell($w[4],4,$row[3],'LR',0,'C',$fill);
+                $this->Ln();
+
+                $fill = !$fill;
         }
-        
-        if ($u>=$cantidad_lineas_primera_cols) {
-            $this->SetX($x);
-        }
-        //$this->SetX($x);
-
-        $this->Cell($w[0],4,$row[0],'LR',0,'C',$fill);
-        $this->Cell($w[1],4,'','LR',0,'C',$fill);
-        $this->Cell($w[2],4,$row[1],'LR',0,'C',$fill);
-        $this->Cell($w[3],4,$row[2],'LR',0,'L',$fill);
-        $this->Cell($w[4],4,$row[3],'LR',0,'C',$fill);
-        $this->Ln();
-
-        $fill = !$fill;
-    }
 
 
 
-//añadiendo los espacios en Blanco
+    //añadiendo los espacios en Blanco
     if($u<150){
 
-$this->SetX($x);
-    //Posicion Vertical a partir de donde salen los espacios en blancos
-//$this->SetY();
+        $this->SetX($x);
+        //Posicion Vertical a partir de donde salen los espacios en blancos
+        //$this->SetY();
 
         for ($o=$u; $o < 128; $o++) { 
               //$this->SetX(112);
@@ -253,21 +253,21 @@ $this->SetX($x);
                 }
 
     }
-    /*Fin de espacios en blanco*/
+        /*Fin de espacios en blanco*/
 
 
-if($u<$cantidad_lineas_primera_cols){
-    //cierre de la primera tabla
-    $this->SetX(5);
-    // Closing line
-    $this->Cell(array_sum($w),0,'','T');
-}else{
+    if($u<$cantidad_lineas_primera_cols){
+        //cierre de la primera tabla
+        $this->SetX(5);
+        // Closing line
+        $this->Cell(array_sum($w),0,'','T');
+    }else{
 
-    $this->SetX(109);
-    // Closing line ( SEGUNDA TABLA)
-    $this->Cell(array_sum($w),0,'','T');
+        $this->SetX(109);
+        // Closing line ( SEGUNDA TABLA)
+        $this->Cell(array_sum($w),0,'','T');
 
-}
+    }
 
                 
 
@@ -275,83 +275,176 @@ if($u<$cantidad_lineas_primera_cols){
 }
 
 
-function Tabla_fac_ventas($header, $data)
-{
-    // Colors, line width and bold font
-    $this->SetFillColor(255,0,0);
-    $this->SetTextColor(255);
-    $this->SetDrawColor(128,0,0);
-    $this->SetLineWidth(.3);
-    $this->SetFont('','B',9);
-    // Header
-    $w = array(20, 22,30,22, 20,20,20);
+public function txt_mes($n_mes){
+    $txt="";
+    switch ($n_mes) {
+        case '1':
+            $txt="ENERO";
+            break;
+        case '01':
+            $txt="ENERO";
+            break;
+        case '2':
+            $txt="FEBRERO";
+            break;
+        case '02':
+            $txt="FEBRERO";
+            break;
+        case '3':
+            $txt="MARZO";
+            break;
+        case '03':
+            $txt="MARZO";
+            break;
+        case '4':
+            $txt="ABRIL";
+            break;
+        case '04':
+            $txt="ABRIL";
+            break;
+        case '05':
+            $txt="MAYO";
+            break;
+        case '5':
+            $txt="MAYO";
+            break;
+        case '06':
+            $txt="JUNIO";
+            break;
+        case '6':
+            $txt="JUNIO";
+            break;
+        case '07':
+            $txt="JULIO";
+            break;
+        case '7':
+            $txt="JULIO";
+            break;
+        case '08':
+            $txt="AGOSTO";
+            break;
+        case '8':
+            $txt="AGOSTO";
+            break;
+        case '09':
+            $txt="SEPTIEMBRE";
+            break;
+        case '9':
+            $txt="SEPTIEMBRE";
+            break;
+        case '10':
+            $txt="OCTUBRE";
+            break;
+        case '11':
+            $txt="NOVIEMBRE";
+            break;
+        case '12':
+            $txt="DICIEMBRE";
+            break;
+        
+        default:
+            # code...
+            break;
+    }
+        return $txt;
+}//fin de txt_mes
+function membrete_Tabla_fac_ventas($w,$mes,$year){
+//$this->Cell(array_sum($w),0,'','T');
+        #Establecemos los márgenes izquierda, arriba y derecha:
+     
+   // $this->AddPage();
+    $razon="Mayorista de Confites y Viveres ( DIDECO, C.A.";
+    $rif="J075168089";
+    # MENBRETE
+        #fuente
+        $this->SetFont('Arial','IB',12);
+    $this->Cell(0,5,$razon.' - '.$rif.' )',0,0,'C');
+        $this->SetFont('Arial','I',8);
+        $this->Ln();
+    $this->Cell(0,4,'Libro de Ventas',0,0,'C');
+        $this->Ln();
+    $this->Cell(0,4,$this->txt_mes($mes).' - '.$year,0,0,'C');
+        $this->Ln();
+    $this->Cell(0,3,'Emitido el '.date('d/m/Y h:i A') ,0,0,'C');
+    $this->Write(2,'Pagina '.$this->PageNo().'/{nb}');    
+        $this->Ln(); 
+        $this->Ln();
+     # FIN de solo TEXTO   
 
-    $this->SetY(50);
-    $this->SetX(109);
+    // Colors, line width and bold font
+    $this->SetFillColor(50,50,50); // 255 0 0 >ROJO
+    $this->SetTextColor(255); // 255-> BLANCO
+    $this->SetDrawColor(0,0,0);//128,0,0->Rojo
+    $this->SetLineWidth(.2);//->grosor de linea Verticales
+    $this->SetFont('','B',6);
+
+    $header=array('FECHA','NRO.','NRO','MODO','NOTA','NOTA','DOC.','COMPROBANTE','RIF','RAZON','BASE'); 
     for($i=0;$i<count($header);$i++){
 
-     $this->Cell($w[$i],6,$header[$i],1,0,'C',true);
+     $this->Cell($w[$i],5,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
+    $header=array('DOC.','DOC.','CONTROL','PAGO','CREDITO','DEBITO','REFER.','','','',''); 
+    for($i=0;$i<count($header);$i++){
+
+     $this->Cell($w[$i],5,$header[$i],0,0,'C',true);
+       }   
+    $this->Ln();
+    
     // Color and font restoration
     $this->SetFillColor(224,235,255);
     $this->SetTextColor(0);
     $this->SetFont('');
+}
+
+function Tabla_fac_ventas($header, $data,$mes,$year)
+{
+    // Header
+    $w = array(15, 10,13,18, 20,20,20,28,14,65,20);
+    $x=5;
+       //$this->membrete_Tabla_fac_ventas($w); 
+
     // Data
     $fill = false;
-    $u=0;
 
-$this->SetFont('Courier','',8);
+$this->SetFont('Courier','',10);
 
-                    $x=109;
 
-                    //$this->SetY(32);
-                    //$this->SetX(0);
-                    
-    foreach($data as $row)
-    {
-       $u++;
-       $cantidad_lineas_primera_cols=0;
-        if($u==$cantidad_lineas_primera_cols){
-            // Closing line Primera tabla
-            $this->Cell(array_sum($w),0,'','T');
-            $this->SetX(109);
-            $this->cabeceraTabla2($header,$w,$x);
-        }
-        
-        if ($u>=$cantidad_lineas_primera_cols) {
-            $this->SetX($x);
-        }
-        //$this->SetX($x);
-
-        $this->Cell($w[0],4,$row[0],'LR',0,'C',$fill);
-        $this->Cell($w[1],4,$row[1],'LR',0,'C',$fill);
-        $this->Cell($w[2],4,$row[2],'LR',0,'C',$fill);
-        $this->Cell($w[3],4,$row[3],'LR',0,'C',$fill);
-        $this->Cell($w[4],4,$row[4],'LR',0,'C',$fill);
-        $this->Cell($w[5],4,$row[5],'LR',0,'C',$fill);
-        $this->Cell($w[5],4,$row[6],'LR',0,'C',$fill);
+          $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
+    for($c=0 ; $c < count($data) ; $c++)
+    {  
+        //if($this->GetY()<37)  {   $this->membrete_Tabla_fac_ventas($w,$mes,$year);   }
+        if($this->GetY()==190){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
+        $this->Cell($w[0],4,$data[$c][0],'LR',0,'C',$fill);
+        $this->Cell($w[1],4,$data[$c][1],'LR',0,'C',$fill);
+        $this->Cell($w[2],4,$data[$c][2],'LR',0,'C',$fill);
+        $this->Cell($w[3],4,$data[$c][3],'LR',0,'C',$fill);
+        $this->Cell($w[4],4,$data[$c][4],'LR',0,'C',$fill);
+        $this->Cell($w[5],4,$data[$c][5],'LR',0,'C',$fill);
+        $this->Cell($w[6],4,$data[$c][6],'LR',0,'C',$fill); 
+        $this->Cell($w[7],4,$data[$c][7],'LR',0,'C',$fill); 
+        $this->Cell($w[8],4,$data[$c][8],'LR',0,'C',$fill); 
+        $this->Cell($w[9],4,$data[$c][9],'L',0,'L',$fill);  
+        $this->Cell($w[10],4,number_format($data[$c][10],2,',','.')  ,'R',0,'R',$fill); 
+    
         $this->Ln();
+                /*
+                if( $this->GetY()>178){                                    
+                    //El Numero de Pagina       
+                        #fuente
+                        $this->SetFont('Arial','I',8);
+                        $this->SetY(183);$this->SetX(290);
+                        $this->Cell(0,10,'Pagina '.$this->PageNo().'/{nb}',0,0,'C');
+                        $this->Ln();
+                     }*/
 
         $fill = !$fill;
     }
+    $this->Cell(array_sum($w),0,'','T');
 
 
 
 
-
-            if($u<$cantidad_lineas_primera_cols){
-                //cierre de la primera tabla
-                $this->SetX(5);
-                // Closing line
-                $this->Cell(array_sum($w),0,'','T');
-            }else{
-
-                $this->SetX(109);
-                // Closing line ( SEGUNDA TABLA)
-                $this->Cell(array_sum($w),0,'','T');
-
-            }
 
 }
 

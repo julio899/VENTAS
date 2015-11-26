@@ -120,8 +120,8 @@ public function menbrete_fac_ventas($pdf,$mes,$year){
     	$pdf->Ln();
     $pdf->Cell(0,3,'Emitido el '.date('d/m/Y h:i A'),0,0,'C');
 
-		$pdf->Setx(5);
-    		$pdf->Cell(0,5,'FECHA     NRO. DOCUMENT     Nro CONTROL     MODO PAGO',0,0,'L'); $pdf->Ln();
+		//$pdf->Setx(5);
+    		//$pdf->Cell(0,5,'FECHA     NRO. DOCUMENT     Nro CONTROL     MODO PAGO',0,0,'L'); $pdf->Ln();
 
 }
 
@@ -138,23 +138,26 @@ public function pie_pag($pdf){
 public function imp_fac_ventas_dideco($mes="",$year=""){
 	$this->load->helper('pdf');
 	$this->load->model('data_complemento');
-	$fac_compras=$this->data_complemento->get_fac_ventas_dideco($mes,$year);
+	$fac_ventas=$this->data_complemento->get_fac_ventas_dideco($mes,$year);
 	$pdf = new PDF('L','mm','Legal');
-	$pdf->AliasNbPages();
+	$pdf->SetMargins(5,5,5);   
+	$pdf->AliasNbPages(); 
 	$pdf->AddPage();
-	$this->menbrete_fac_ventas($pdf,$mes,$year);
-
-		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF'); 
+	//$this->menbrete_fac_ventas($pdf,$mes,$year);
+	
+		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF','RIF','RAZON'); 
 		$datos=null;
-    	foreach ($fac_compras as $key => $value) {
-    		if ($pdf->GetY() >180.00125 ){ $this->pie_pag($pdf); $this->menbrete_fac_ventas($pdf,$mes,$year);  }
+    	foreach ($fac_ventas as $key => $value) {
+    		//if ($pdf->GetY() >180.00125 ){ $this->pie_pag($pdf); $this->menbrete_fac_ventas($pdf,$mes,$year);  }
     		$modo_pago='CONTADO';
     		if($value['condi']==1){ $modo_pago='CREDITO'; }
     		//$pdf->Cell(0,5,$value['fecemi'].'       '.$value['numdoc'].'                      '.$value['control'].'       '.$modo_pago.$value['condi'],0,0,'L'); $pdf->Ln();
-    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,'','','');
+    		$codcte=substr($value['codcte'],-4,4);
+    		$cliente=$this->data_complemento->get_cliente($codcte,'001');
+    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ),trim($value['monto']) );
     	}
-    	$pdf->Tabla_fac_ventas($header, $datos);
-    	$pdf->Setx(5);
+    	$pdf->Tabla_fac_ventas($header, $datos,$mes,$year);
+    	
 	
 		
 
