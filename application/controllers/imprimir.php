@@ -145,10 +145,7 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	$this->menbrete_fac_ventas($pdf,$mes,$year);
 
 		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF'); 
-		$datos[]=null;
-    	//$datos[]=array(1,2,3,4,5,6);
-    	//$datos[]=array(1,2,3,4,5,6);
-    	
+		$datos=null;
     	foreach ($fac_compras as $key => $value) {
     		if ($pdf->GetY() >180.00125 ){ $this->pie_pag($pdf); $this->menbrete_fac_ventas($pdf,$mes,$year);  }
     		$modo_pago='CONTADO';
