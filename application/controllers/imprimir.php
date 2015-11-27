@@ -154,7 +154,20 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     		//$pdf->Cell(0,5,$value['fecemi'].'       '.$value['numdoc'].'                      '.$value['control'].'       '.$modo_pago.$value['condi'],0,0,'L'); $pdf->Ln();
     		$codcte=substr($value['codcte'],-4,4);
     		$cliente=$this->data_complemento->get_cliente($codcte,'001');
-    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],$modo_pago,'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ),trim($value['monto']) );
+    		$excento=0; $monto_final=0;
+    		/*echo "moniva: ".$value['moniva']." [ monto (".$value['monto']." * ".$value['iva'].") iva / 100 ] : ".($value['monto']*$value['iva'])/100 ."-->".($value['monto']*$value['iva'])/100 ;
+			exit;
+    		if($value['moniva'] != ($value['monto']*$value['iva'])/100    ){
+    			$excento=$value['monto'] - ( ($value['moniva']* 100) / $value['iva'] )   ;
+    		}
+    		$base=0;
+    		if($excento>0){
+    			$base=$value['monto']-$excento;
+    		}else{
+    			$base=$value['monto'];
+    		}*/
+
+    		$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'] );
     	}
     	$pdf->Tabla_fac_ventas($header, $datos,$mes,$year);
     	

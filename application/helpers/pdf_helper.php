@@ -128,24 +128,23 @@ function configuracionMenbreteDidecoDeimport(){
 
 function cabeceraTabla($header){
     $this->membrete_cliente();
-// Colors, line width and bold font
-    $this->SetFillColor(255,0,0);
-    $this->SetTextColor(255);
-    $this->SetDrawColor(128,0,0);
-    $this->SetLineWidth(.3);
-    $this->SetFont('','B');
-        // Header
-    $w = array(9, 8,8, 50, 10);
-                         for($i=0;$i<count($header);$i++){
+    // Colors, line width and bold font
+        $this->SetFillColor(255,0,0);
+        $this->SetTextColor(255);
+        $this->SetDrawColor(128,0,0);
+        $this->SetLineWidth(.3);
+        $this->SetFont('','B');
+            // Header
+        $w = array(9, 8,8, 50, 10);
+                             for($i=0;$i<count($header);$i++){
 
-                            $this->Cell($w[$i],6,$header[$i],1,0,'C',true);
-                            }
-                        $this->Ln();
-    // Color and font restoration
-    $this->SetFillColor(224,235,255);
-    $this->SetTextColor(0);
-    $this->SetFont('');
-
+                                $this->Cell($w[$i],6,$header[$i],1,0,'C',true);
+                                }
+                            $this->Ln();
+        // Color and font restoration
+        $this->SetFillColor(224,235,255);
+        $this->SetTextColor(0);
+        $this->SetFont('');
 }
 
 function cabeceraTabla2($header,$w,$x){
@@ -366,7 +365,9 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->Cell(0,4,$this->txt_mes($mes).' - '.$year,0,0,'C');
         $this->Ln();
     $this->Cell(0,3,'Emitido el '.date('d/m/Y h:i A') ,0,0,'C');
-    $this->Write(2,'Pagina '.$this->PageNo().'/{nb}');    
+    $this->SetX(330);
+    $this->Write(2,'Pagina '.$this->PageNo().'/{nb}'); 
+    $this->SetX(0);    
         $this->Ln(); 
         $this->Ln();
      # FIN de solo TEXTO   
@@ -376,18 +377,18 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->SetTextColor(255); // 255-> BLANCO
     $this->SetDrawColor(0,0,0);//128,0,0->Rojo
     $this->SetLineWidth(.2);//->grosor de linea Verticales
-    $this->SetFont('','B',6);
+    $this->SetFont('','B',7);
 
-    $header=array('FECHA','NRO.','NRO','MODO','NOTA','NOTA','DOC.','COMPROBANTE','RIF','RAZON','BASE'); 
+    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO'); 
     for($i=0;$i<count($header);$i++){
 
-     $this->Cell($w[$i],5,$header[$i],0,0,'C',true);
+     $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
-    $header=array('DOC.','DOC.','CONTROL','PAGO','CREDITO','DEBITO','REFER.','','','',''); 
+    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','REFER.','RETENCION','RETENCION IVA','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO'); 
     for($i=0;$i<count($header);$i++){
 
-     $this->Cell($w[$i],5,$header[$i],0,0,'C',true);
+     $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
     
@@ -400,7 +401,7 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
 function Tabla_fac_ventas($header, $data,$mes,$year)
 {
     // Header
-    $w = array(15, 10,13,18, 20,20,20,28,14,65,20);
+    $w = array(8,13, 10,15, 20,20,20,15,28,17,85,17,17,17,7,17,17);
     $x=5;
        //$this->membrete_Tabla_fac_ventas($w); 
 
@@ -414,20 +415,101 @@ $this->SetFont('Courier','',10);
     for($c=0 ; $c < count($data) ; $c++)
     {  
         //if($this->GetY()<37)  {   $this->membrete_Tabla_fac_ventas($w,$mes,$year);   }
-        if($this->GetY()==190){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
-        $this->Cell($w[0],4,$data[$c][0],'LR',0,'C',$fill);
-        $this->Cell($w[1],4,$data[$c][1],'LR',0,'C',$fill);
-        $this->Cell($w[2],4,$data[$c][2],'LR',0,'C',$fill);
-        $this->Cell($w[3],4,$data[$c][3],'LR',0,'C',$fill);
-        $this->Cell($w[4],4,$data[$c][4],'LR',0,'C',$fill);
-        $this->Cell($w[5],4,$data[$c][5],'LR',0,'C',$fill);
-        $this->Cell($w[6],4,$data[$c][6],'LR',0,'C',$fill); 
-        $this->Cell($w[7],4,$data[$c][7],'LR',0,'C',$fill); 
-        $this->Cell($w[8],4,$data[$c][8],'LR',0,'C',$fill); 
-        $this->Cell($w[9],4,$data[$c][9],'L',0,'L',$fill);  
-        $this->Cell($w[10],4,number_format($data[$c][10],2,',','.')  ,'R',0,'R',$fill); 
-    
-        $this->Ln();
+        if($this->GetY()==187){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
+
+        $palabras=explode(' ', trim($data[$c][8]));
+
+        # SI LA CADENA PASA DE 40 CARACTERES
+        if(strlen(trim($data[$c][8]))>60){
+
+                    $primera_linea="";$segunda_linea="";
+                    for($p=0;$p<count($palabras);$p++){
+                        if($p<6){
+                            $primera_linea.=$palabras[$p].' ';
+                        }else{
+                            $segunda_linea.=$palabras[$p].' ';
+                        }
+                    }// fin del for llenado de lineas
+
+                        # PRIMERA LINEA
+                            $this->Cell($w[0],3,$c+1,'LR',0,'C',$fill);
+                            $this->Cell($w[1],3,$data[$c][0],'LR',0,'C',$fill);
+                            $this->Cell($w[2],3,$data[$c][1],'LR',0,'C',$fill);
+                            $this->Cell($w[3],3,$data[$c][2],'LR',0,'C',$fill);
+                            $this->Cell($w[4],3,$data[$c][3],'LR',0,'C',$fill);
+                            $this->Cell($w[5],3,$data[$c][4],'LR',0,'C',$fill);
+                            $this->Cell($w[6],3,$data[$c][5],'LR',0,'C',$fill);
+                            $this->Cell($w[7],3,'','LR',0,'C',$fill);
+                            $this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
+                            $this->Cell($w[9],3,$data[$c][7],'LR',0,'C',$fill); 
+                            /*
+                            $this->Cell($w[8],3,$data[$c][8],'LR',0,'C',$fill); 
+                            $this->Cell($w[9],3,$primera_linea ,'L',0,'L',$fill);  
+                            $this->Cell($w[10],3,number_format($data[$c][10],2,',','.').'/'.$c  ,'R',0,'R',$fill); 
+                           */
+                            $this->Cell($w[10], 3,$primera_linea,'LR',0,'L',$fill); 
+                            $this->Cell($w[11], 3,number_format($data[$c][9],2,',','.') ,'LR',0,'R',$fill); 
+                            $this->Cell($w[12],3,number_format($data[$c][10],2,',','.') ,'LR',0,'R',$fill); 
+                            $this->Cell($w[13],3,number_format($data[$c][11],2,',','.') ,'LR',0,'R',$fill);
+                            $this->Cell($w[14],3,$data[$c][12],'LR',0,'C',$fill); 
+                            $this->Cell($w[15],3,number_format($data[$c][13],2,',','.') ,'LR',0,'R',$fill);
+                            $this->Cell($w[16],3,'' ,'LR',0,'R',$fill);
+                           
+                            $this->Ln();
+                        # FIN PRIMERA LINEA
+
+                        // - * - * - * - * - * - * - * - * - * - * - * 
+                            if(strlen($segunda_linea)>0){
+
+                                    # SEGUNDA LINEA                    
+                                        $this->Cell($w[0],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[1],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[2],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[3],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[4],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[5],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[6],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[7],3,'','LR',0,'C',$fill);
+                                        $this->Cell($w[8],3,'','LR',0,'C',$fill); 
+                                        $this->Cell($w[9],3,'','LR',0,'C',$fill); 
+                                        $this->Cell($w[10],3,$segunda_linea,'LR',0,'L',$fill); 
+                                        $this->Cell($w[11],3,'' ,'LR',0,'R',$fill);  
+                                        $this->Cell($w[12],3,'' ,'LR',0,'R',$fill); 
+                                        $this->Cell($w[13],3,'' ,'LR',0,'R',$fill); 
+                                        $this->Cell($w[14],3,'' ,'LR',0,'R',$fill);
+                                        $this->Cell($w[15],3,'' ,'LR',0,'R',$fill);
+                                        $this->Cell($w[16],3,'' ,'LR',0,'R',$fill);
+
+                          
+                                        $this->Ln();
+                                    # FIN SEGUNDA LINEA
+           
+                            }
+                    
+
+        }else{
+                $this->Cell($w[0],3,$c+1,'LR',0,'C',$fill);
+                $this->Cell($w[1],3,$data[$c][0],'LR',0,'C',$fill);
+                $this->Cell($w[2],3,$data[$c][1],'LR',0,'C',$fill);
+                $this->Cell($w[3],3,$data[$c][2],'LR',0,'C',$fill);
+                $this->Cell($w[4],3,$data[$c][3],'LR',0,'C',$fill);
+                $this->Cell($w[5],3,$data[$c][4],'LR',0,'C',$fill);
+                $this->Cell($w[6],3,$data[$c][5],'LR',0,'C',$fill);
+                $this->Cell($w[7],3,'','LR',0,'C',$fill);
+                $this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
+                $this->Cell($w[9],3,$data[$c][7],'LR',0,'C',$fill); 
+                $this->Cell($w[10],3,$data[$c][8],'LR',0,'L',$fill); 
+                $this->Cell($w[11], 3,number_format($data[$c][9],2,',','.') ,'LR',0,'R',$fill);
+                $this->Cell($w[12],3,number_format($data[$c][10],2,',','.') ,'LR',0,'R',$fill);
+                $this->Cell($w[13],3,number_format($data[$c][11],2,',','.') ,'LR',0,'R',$fill);
+                $this->Cell($w[14],3,$data[$c][12],'LR',0,'C',$fill);
+                $this->Cell($w[15],3,number_format($data[$c][13],2,',','.') ,'LR',0,'R',$fill);
+                $this->Cell($w[16],3,'','LR',0,'R',$fill);
+                           
+            
+                $this->Ln();
+
+        }
                 /*
                 if( $this->GetY()>178){                                    
                     //El Numero de Pagina       
