@@ -362,11 +362,11 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
         $this->Ln();
     $this->Cell(0,4,'Libro de Ventas',0,0,'C');
         $this->Ln();
-    $this->Cell(0,4,$this->txt_mes($mes).' - '.$year,0,0,'C');
-        $this->Ln();
-    $this->Cell(0,3,'Emitido el '.date('d/m/Y h:i A') ,0,0,'C');
-    $this->SetX(330);
-    $this->Write(2,'Pagina '.$this->PageNo().'/{nb}'); 
+    $this->Cell(0,4,$this->txt_mes($mes).' - 20'.$year,0,0,'C');
+       // $this->Ln();
+    //$this->Cell(0,3, ,0,0,'C');
+    $this->SetX(288);
+    $this->Write(2,'Emitido el '.date('d/m/Y h:i A').' * Pagina '.$this->PageNo().'/{nb}'); 
     $this->SetX(0);    
         $this->Ln(); 
         $this->Ln();
@@ -415,7 +415,7 @@ $this->SetFont('Courier','',10);
     for($c=0 ; $c < count($data) ; $c++)
     {  
         //if($this->GetY()<37)  {   $this->membrete_Tabla_fac_ventas($w,$mes,$year);   }
-        if($this->GetY()==187){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
+        if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
 
         $palabras=explode(' ', trim($data[$c][8]));
 
