@@ -169,7 +169,7 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     		$tiene_retencion_en_mes=$this->data_complemento->tiene_retencion_en_mes_dideco($value['numdoc'],$mes,$year);
     		if($tiene_retencion_en_mes){
     			//var_dump($tiene_retencion_en_mes); exit();
-    			$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'],'control_comprobante'=>$tiene_retencion_en_mes[0]['control'],'fecemi_comprobante'=>$tiene_retencion_en_mes[0]['fecemi']);
+    			$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'],'control_comprobante'=>$tiene_retencion_en_mes[0]['control'],'fecemi_comprobante'=>$tiene_retencion_en_mes[0]['fecemi'],'monto_retenido'=>$tiene_retencion_en_mes[0]['monto']);
     		}else{
     				$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'] );		
     		}

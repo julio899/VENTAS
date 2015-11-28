@@ -459,8 +459,14 @@ $this->SetFont('Courier','',10);
                             $this->Cell($w[13],3,number_format($data[$c][11],2,',','.') ,'LR',0,'R',$fill);
                             $this->Cell($w[14],3,$data[$c][12],'LR',0,'C',$fill); 
                             $this->Cell($w[15],3,number_format($data[$c][13],2,',','.') ,'LR',0,'R',$fill);
-                            $this->Cell($w[16],3,'' ,'LR',0,'R',$fill);
-                           
+                            //$this->Cell($w[16],3,'','LR',0,'R',$fill);
+
+                                if(isset($data[$c]['monto_retenido'])){
+                                        $this->Cell($w[16],3,$data[$c]['monto_retenido'],'LR',0,'C',$fill);
+                                }else{
+                                        $this->Cell($w[16],3,'','LR',0,'R',$fill);
+ 
+                                }
                             $this->Ln();
                         # FIN PRIMERA LINEA
 
@@ -516,7 +522,14 @@ $this->SetFont('Courier','',10);
                 $this->Cell($w[13],3,number_format($data[$c][11],2,',','.') ,'LR',0,'R',$fill);
                 $this->Cell($w[14],3,$data[$c][12],'LR',0,'C',$fill);
                 $this->Cell($w[15],3,number_format($data[$c][13],2,',','.') ,'LR',0,'R',$fill);
-                $this->Cell($w[16],3,'','LR',0,'R',$fill);
+                //$this->Cell($w[16],3,'','LR',0,'R',$fill);
+
+                                if(isset($data[$c]['monto_retenido'])){
+                                        $this->Cell($w[16],3,$data[$c]['monto_retenido'],'LR',0,'C',$fill);
+                                }else{
+                                        $this->Cell($w[16],3,'','LR',0,'R',$fill);
+ 
+                                }
                            
             
                 $this->Ln();
