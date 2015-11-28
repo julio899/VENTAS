@@ -12,6 +12,20 @@ function get_fac_ventas_dideco($mes,$year){
     return $query->result_array();
 }//fin de get_fac_ventas
 
+function tiene_retencion_en_mes_dideco($nro_fac,$mes,$year){
+    /*
+    SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%$mes/$year' AND `docref` LIKE '$nro_fac' LIMIT 1 
+    */
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%$mes/$year' AND `docref` LIKE '$nro_fac' LIMIT 1";
+    $query=$this->db->query($sql);
+    $respuesta=FALSE;
+    $datos=$query->result_array();
+        if(count($datos)>0){ $respuesta=$datos; }
+
+    return $respuesta;
+}
+
 function get_vendedores(){
 $sql="SELECT * FROM `usuariosventas` WHERE `ciudad` NOT LIKE '' AND `nombre` NOT LIKE '' AND `tipo` LIKE 'V' ORDER BY `usuariosventas`.`nombre` ASC";
 $query=$this->db->query($sql);

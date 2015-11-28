@@ -439,8 +439,14 @@ $this->SetFont('Courier','',10);
                             $this->Cell($w[4],3,$data[$c][3],'LR',0,'C',$fill);
                             $this->Cell($w[5],3,$data[$c][4],'LR',0,'C',$fill);
                             $this->Cell($w[6],3,$data[$c][5],'LR',0,'C',$fill);
-                            $this->Cell($w[7],3,'','LR',0,'C',$fill);
-                            $this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
+                                if(isset($data[$c]['control_comprobante'])){
+                                        $this->Cell($w[7],3,$data[$c]['fecemi_comprobante'],'LR',0,'C',$fill);
+                                        $this->Cell($w[8],3,$data[$c]['control_comprobante'],'LR',0,'C',$fill);
+                                }else{
+                                        $this->Cell($w[7],3,'','LR',0,'C',$fill);   
+                                        $this->Cell($w[8],3,'','LR',0,'C',$fill);   
+                                }
+                            //$this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
                             $this->Cell($w[9],3,$data[$c][7],'LR',0,'C',$fill); 
                             /*
                             $this->Cell($w[8],3,$data[$c][8],'LR',0,'C',$fill); 
@@ -495,8 +501,14 @@ $this->SetFont('Courier','',10);
                 $this->Cell($w[4],3,$data[$c][3],'LR',0,'C',$fill);
                 $this->Cell($w[5],3,$data[$c][4],'LR',0,'C',$fill);
                 $this->Cell($w[6],3,$data[$c][5],'LR',0,'C',$fill);
-                $this->Cell($w[7],3,'','LR',0,'C',$fill);
-                $this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
+                                if(isset($data[$c]['control_comprobante'])){
+                                        $this->Cell($w[7],3,$data[$c]['fecemi_comprobante'],'LR',0,'C',$fill);
+                                        $this->Cell($w[8],3,$data[$c]['control_comprobante'],'LR',0,'C',$fill);
+                                }else{
+                                        $this->Cell($w[7],3,'','LR',0,'C',$fill); 
+                                        $this->Cell($w[8],3,'','LR',0,'C',$fill);   
+                                }
+                //$this->Cell($w[8],3,$data[$c][6],'LR',0,'C',$fill); 
                 $this->Cell($w[9],3,$data[$c][7],'LR',0,'C',$fill); 
                 $this->Cell($w[10],3,$data[$c][8],'LR',0,'L',$fill); 
                 $this->Cell($w[11], 3,number_format($data[$c][9],2,',','.') ,'LR',0,'R',$fill);
