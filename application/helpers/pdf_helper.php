@@ -462,7 +462,7 @@ $this->SetFont('Courier','',10);
                             //$this->Cell($w[16],3,'','LR',0,'R',$fill);
 
                                 if(isset($data[$c]['monto_retenido'])){
-                                        $this->Cell($w[16],3,$data[$c]['monto_retenido'],'LR',0,'C',$fill);
+                                        $this->Cell($w[16],3,number_format($data[$c]['monto_retenido'],2,',','.') ,'LR',0,'R',$fill);
                                 }else{
                                         $this->Cell($w[16],3,'','LR',0,'R',$fill);
  
@@ -525,7 +525,7 @@ $this->SetFont('Courier','',10);
                 //$this->Cell($w[16],3,'','LR',0,'R',$fill);
 
                                 if(isset($data[$c]['monto_retenido'])){
-                                        $this->Cell($w[16],3,$data[$c]['monto_retenido'],'LR',0,'C',$fill);
+                                        $this->Cell($w[16],3,number_format($data[$c]['monto_retenido'],2,',','.') ,'LR',0,'R',$fill);
                                 }else{
                                         $this->Cell($w[16],3,'','LR',0,'R',$fill);
  
