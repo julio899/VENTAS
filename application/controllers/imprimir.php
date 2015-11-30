@@ -6,6 +6,17 @@ $this->load->view('html/head2');
 $this->load->view('imprimir/select_compa_imp_format');
 $this->load->view('html/footer2');
 }
+
+public function pruebas(){
+	$this->load->model('data_complemento');
+	#alacenamos las retenciones de notas de credito
+	$retenciones_de_nc=$this->data_complemento->retencion_notas_de_credito_dideco('10','15');
+	foreach ($retenciones_de_nc as $key => $value) {
+		$cliente=$this->data_complemento->get_cliente( substr($retenciones_de_nc[$key]['codcte'], -4,4) ,'001');
+		echo "docref:".$retenciones_de_nc[$key]['docref'].' - control:'.$retenciones_de_nc[$key]['control'].' - monto:'.$retenciones_de_nc[$key]['monto'].' - fecsist:'.$retenciones_de_nc[$key]['fechsit'].' - fecemi:'.$retenciones_de_nc[$key]['fecemi'].' - razsoc: '.$cliente['razsoc']."<br>";
+	}
+}
+
 public function procesos_productos($proveedores,$datosTabla,$compa){
 
 	 $this->load->model('data_inventario');

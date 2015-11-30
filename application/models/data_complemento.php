@@ -12,6 +12,18 @@ function get_fac_ventas_dideco($mes,$year){
     return $query->result_array();
 }//fin de get_fac_ventas
 
+function retencion_notas_de_credito_dideco($mes,$year){
+
+    $this->load->database('dideco',TRUE);
+     $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%$mes/$year' AND `tipref` LIKE '8' ORDER BY `docref` ASC";
+    $query=$this->db->query($sql);
+    $respuesta=FALSE;
+    $datos=$query->result_array();
+        if(count($datos)>0){ $respuesta=$datos; }
+
+    return $respuesta;
+}
+
 function tiene_retencion_en_mes_dideco($nro_fac,$mes,$year){
     /*
     SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%$mes/$year' AND `docref` LIKE '$nro_fac' LIMIT 1 
@@ -315,6 +327,7 @@ return $this->temporal;
 
 function get_cliente($codCte='',$codCompa='')
 {
+    $datos=null;
 	$compaTXT='';
 switch ($codCompa) {
 			case '001':
