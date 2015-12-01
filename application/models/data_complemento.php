@@ -9,10 +9,165 @@ function get_fac_ventas_dideco($mes,$year){
     $this->load->database('dideco',TRUE);
     $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
     $query=$this->db->query($sql);
-    return $query->result_array();
+    //return $query->result_array();
+    $data=$query->result_array();
+    $datos=null;
+        foreach ($data as $key => $value) {
+                $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
+                $razon=$cliente['razsoc'];
+                $rif=$cliente['rif'];
+             $datos[]=array(
+                        'razsoc'    =>$razon,
+                        'rif'       =>$rif,
+                        'numdoc'    =>$value['numdoc'],
+                        'docref'    =>$value['docref'],
+                        'control'    =>$value['control'],
+                        'fecemi'    =>$value['fecemi'],
+                        'base'      =>$value['monto'],
+                        '%'      =>$value['iva'],
+                        'iva'       =>$value['moniva'],
+                        'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
+                        'st'      =>$value['st'],
+                        'tipo'=>'FAC'
+
+                        );
+        }
+    return $datos;
 }//fin de get_fac_ventas
 
-function retencion_notas_de_credito_dideco($mes,$year){
+function get_ret_fuera_mes_dideco($mes,$year){
+    $this->load->database('dideco',TRUE);
+    
+    //$sql="SELECT `codcte`,`numdoc`,`fecemi`,`fechsit`,`monto` ,`tipref`,`docref` FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%%/10/15' ORDER BY `hiscpc`.`fechsit` DESC";
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`fechsit` DESC";
+    $query=$this->db->query($sql);
+    $data=$query->result_array();
+    $datos=null;
+        foreach ($data as $key => $value) {
+            //if("$mes/$year"!=substr(trim($value['fechsit']),-5,5)){
+                echo $value['numdoc']." docR: ".$value['docref']." (fecemi: ".$value['fecemi']." ) / ".$value['fechsit']." - ".substr(trim($value['fechsit']),-5,5)."<br>";
+            //}
+        }
+}
+
+function get_nota_credito_dideco($mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '7' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
+    $query=$this->db->query($sql);
+    $this->data=$query->result_array();
+    $datos=null;
+    foreach ($this->data as $key => $value) {
+        $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
+        $razon=$cliente['razsoc'];
+        $rif=$cliente['rif'];
+        $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '8' AND `fecemi` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
+        $query2=$this->db->query($sql2);
+        $sql_temp_iva=$query2->result_array();
+        $datos[]=array(
+                        'razsoc'    =>$razon,
+                        'rif'       =>$rif,
+                        'numdoc'    =>$value['numdoc'],
+                        'docref'    =>$value['docref'],
+                        'control'    =>$value['control'],
+                        'fecemi'    =>$value['fecemi'],
+                        'base'      =>$value['monto'],
+                        '%'      =>$value['iva'],
+                        'iva'       =>$sql_temp_iva[0]['monto'],
+                        'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
+                        'st'      =>$value['st'],
+                        'tipo'=>'NC'
+
+                        );
+    }
+    return $datos;
+}// FIN de  get_nota_credito_dideco
+
+
+function get_nota_debito_dideco($mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '4' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
+    $query=$this->db->query($sql);
+    $this->data=$query->result_array();
+    $datos=null;
+    foreach ($this->data as $key => $value) {
+        $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
+        $razon=$cliente['razsoc'];
+        $rif=$cliente['rif'];
+        $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
+        $query2=$this->db->query($sql2);
+        $sql_temp_iva=$query2->result_array();
+        $datos[]=array(
+                        'razsoc'    =>$razon,
+                        'rif'       =>$rif,
+                        'numdoc'    =>$value['numdoc'],
+                        'docref'    =>$value['docref'],
+                        'control'    =>$value['control'],
+                        'fecemi'    =>$value['fecemi'],
+                        'base'      =>$value['monto'],
+                        '%'      =>$value['iva'],
+                        'iva'       =>$sql_temp_iva[0]['monto'],
+                        'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
+                        'st'      =>$value['st'],
+                        'tipo'=>'ND'
+
+                        );
+    }
+    return $datos;
+}// FIN de  get_nota_debito_dideco
+
+
+function get_nota_debito_hische_dideco($mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT * FROM `hische` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hische`.`numdoc` ASC";
+    $query=$this->db->query($sql);
+    $this->data=$query->result_array();
+    $datos=null;
+    foreach ($this->data as $key => $value) {
+        $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
+        $razon=$cliente['razsoc'];
+        $rif=$cliente['rif'];
+        //var_dump($sql); exit();
+        $datos[]=array(
+                        'razsoc'    =>$razon,
+                        'rif'       =>$rif,
+                        'numdoc'    =>$value['numdoc'],
+                        'docref'    =>'',
+                        'control'    =>$value['control'],
+                        'fecemi'    =>$value['fecemi'],
+                        'base'      =>$value['monto'],
+                        '%'      =>$value['iva'],
+                        'iva'       =>$value['moniva'],
+                        'retencion' =>$this->tiene_retencion_hische_dideco($value['numdoc'],$mes,$year),
+                        'st'      =>$value['st'],
+                        'tipo'=>'ND'
+
+                        );
+    }
+    return $datos;
+}// FIN de  get_nota_debito_hische_dideco
+
+
+function tiene_retencion_dideco($numdoc,$mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT *  FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $query=$this->db->query($sql);
+    $respuesta=FALSE;
+    $datos=$query->result_array();
+        if(count($datos)>0){ $respuesta=$datos; }
+    return $respuesta;   
+}
+
+function tiene_retencion_hische_dideco($numdoc,$mes,$year){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT *  FROM `hische` WHERE `tipdoc` LIKE '*' AND `fecanc` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $query=$this->db->query($sql);
+    $respuesta=FALSE;
+    $datos=$query->result_array();
+        if(count($datos)>0){ $respuesta=$datos; }
+    return $respuesta;   
+}
+
+/*function retencion_notas_de_credito_dideco($mes,$year){
 
     $this->load->database('dideco',TRUE);
      $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%$mes/$year' AND `tipref` LIKE '8' ORDER BY `docref` ASC";
@@ -22,7 +177,7 @@ function retencion_notas_de_credito_dideco($mes,$year){
         if(count($datos)>0){ $respuesta=$datos; }
 
     return $respuesta;
-}
+}*/
 
 function tiene_retencion_en_mes_dideco($nro_fac,$mes,$year){
     /*

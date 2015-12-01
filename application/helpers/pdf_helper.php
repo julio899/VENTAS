@@ -379,13 +379,13 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->SetLineWidth(.2);//->grosor de linea Verticales
     $this->SetFont('','B',7);
 
-    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO'); 
+    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','STATUS'); 
     for($i=0;$i<count($header);$i++){
 
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
-    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','REFER.','RETENCION','RETENCION IVA','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO'); 
+    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','REFER.','RETENCION','RETENCION IVA','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO',''); 
     for($i=0;$i<count($header);$i++){
 
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
@@ -396,6 +396,106 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->SetFillColor(224,235,255);
     $this->SetTextColor(0);
     $this->SetFont('');
+}
+
+function array_orderby()
+{
+    $args = func_get_args();
+    $data = array_shift($args);
+    foreach ($args as $n => $field) {
+        if (is_string($field)) {
+            $tmp = array();
+            foreach ($data as $key => $row)
+                $tmp[$key] = $row[$field];
+            $args[$n] = $tmp;
+            }
+    }
+    $args[] = &$data;
+    call_user_func_array('array_multisort', $args);
+    return array_pop($args);
+}
+
+function tabla_libro_ventas($data,$mes,$year){
+
+    // Header
+    $w = array(8,13, 10,15, 15,15,15,15,22,17,85,17,17,17,7,17,17,15);
+    $x=5;
+    // Data
+    $fill = false;
+    $this->SetFont('Courier','',10);
+
+    $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
+        for($c=0 ; $c < count($data) ; $c++)
+    {
+        if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
+
+        $this->Cell($w[0],3,$c+1,'LR',0,'C',$fill);
+        $this->Cell($w[1],3,$data[$c]['fecemi'],'LR',0,'C',$fill);
+        # SI ES UNA FACTURA
+        if($data[$c]['tipo']=='FAC'){
+            $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
+        }else{
+            $this->Cell($w[2],3,'','LR',0,'C',$fill);//COLUMNA Nro DOC
+
+            }
+        $this->Cell($w[3],3,$data[$c]['control'],'LR',0,'C',$fill);
+            # si tipo es NC (NOTA de CREDITO)
+             if($data[$c]['tipo']=='NC'){
+                    $this->Cell($w[4],3,$data[$c]['numdoc'],'LR',0,'C',$fill);
+
+             }else{
+                    $this->Cell($w[4],3,'','LR',0,'C',$fill);
+             }
+            # si tipo es ND (NOTA de DEBITO)
+            if($data[$c]['tipo']=='ND'){
+                    $this->Cell($w[5],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//columna nota de DEBITO
+            }else{
+                    $this->Cell($w[5],3,'','LR',0,'C',$fill);//columna nota de DEBITO
+            }
+
+            #SI es FAC no se imprime doc REFE
+            if($data[$c]['tipo']=='FAC'){
+                $this->Cell($w[6],3,'','LR',0,'C',$fill);
+            
+            }else{
+                    $this->Cell($w[6],3,$data[$c]['docref'],'LR',0,'C',$fill);
+            }
+            #en caso que tenga retencion
+            if($data[$c]['retencion']){
+                $this->Cell($w[7],3,$data[$c]['retencion'][0]['fecemi'],'LR',0,'C',$fill);
+                $this->Cell($w[8],3,$data[$c]['retencion'][0]['control'],'LR',0,'C',$fill);
+            }else{
+                $this->Cell($w[7],3,'','LR',0,'C',$fill);
+                $this->Cell($w[8],3,'','LR',0,'C',$fill);
+            }   
+
+        $this->Cell($w[9],3,$data[$c]['rif'],'LR',0,'C',$fill);
+        $this->Cell($w[10],3,$data[$c]['razsoc'],'LR',0,'L',$fill);
+        $this->Cell($w[11],3,$data[$c]['base']+$data[$c]['iva'],'LR',0,'R',$fill);//MONTO CON IVA
+        $this->Cell($w[12],3,'','LR',0,'R',$fill);//EXCENTO
+        $this->Cell($w[13],3,$data[$c]['base'],'LR',0,'R',$fill);//BASE
+        $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
+        $this->Cell($w[15],3,$data[$c]['iva'],'LR',0,'R',$fill);// IVA
+        #en caso que tenga retencion
+            if($data[$c]['retencion']){
+                    $this->Cell($w[16],3,trim($data[$c]['retencion'][0]['monto']),'LR',0,'C',$fill);
+            }else{
+                    $this->Cell($w[16],3,'','LR',0,'C',$fill);
+
+            }
+        #en CASO de ANULACION
+            if($data[$c]['st']=='A'){
+                
+                $this->Cell($w[17],3,'ANULADO'.$data[$c]['tipo'],'LR',0,'C',$fill);
+            }else{
+                $this->Cell($w[17],3,''.$data[$c]['tipo'],'LR',0,'C',$fill);
+            }
+
+        $this->Ln(); $fill = !$fill;
+
+    }//fin de for
+    
+    $this->Cell(array_sum($w),0,'','T');
 }
 
 function Tabla_fac_ventas($header, $data,$mes,$year)
