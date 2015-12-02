@@ -16,6 +16,8 @@ function get_fac_ventas_dideco($mes,$year){
                 $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
                 $razon=$cliente['razsoc'];
                 $rif=$cliente['rif'];
+                $arreglo_fecha=explode('/',$value['fecemi']);
+                $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
              $datos[]=array(
                         'razsoc'    =>$razon,
                         'rif'       =>$rif,
@@ -28,7 +30,9 @@ function get_fac_ventas_dideco($mes,$year){
                         'iva'       =>$value['moniva'],
                         'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
                         'st'      =>$value['st'],
-                        'tipo'=>'FAC'
+                        'fecanul'      =>$value['fecanul'],
+                        'tipo'=>'FAC',
+                        'orden_fecha'=>$orden_fecha
 
                         );
         }
@@ -39,14 +43,51 @@ function get_ret_fuera_mes_dideco($mes,$year){
     $this->load->database('dideco',TRUE);
     
     //$sql="SELECT `codcte`,`numdoc`,`fecemi`,`fechsit`,`monto` ,`tipref`,`docref` FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%%/10/15' ORDER BY `hiscpc`.`fechsit` DESC";
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`fechsit` DESC";
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`fechsit` ASC";
     $query=$this->db->query($sql);
     $data=$query->result_array();
     $datos=null;
+
         foreach ($data as $key => $value) {
-            //if("$mes/$year"!=substr(trim($value['fechsit']),-5,5)){
-                echo $value['numdoc']." docR: ".$value['docref']." (fecemi: ".$value['fecemi']." ) / ".$value['fechsit']." - ".substr(trim($value['fechsit']),-5,5)."<br>";
-            //}
+            if("$mes/$year"!=substr(trim($this->get_doc_hiscpc_dideco($value['docref'],$value['tipref'])[0]['fecemi']),-5,5)){
+                //echo "*)".$value['numdoc']." docR: ".$value['docref']." (fecemi: ".$value['fecemi']." ) / fechsit ".$value['fechsit']." - ".substr(trim($value['fechsit']),-5,5)." * tipref:".$value['tipref']." #[".$value['docref']."]FAC fc".$this->get_doc_hiscpc_dideco($value['docref'],$value['tipref'])[0]['fecemi']." - FAC fsit ".$this->get_doc_hiscpc_dideco($value['docref'],$value['tipref'])[0]['fechsit']."<br>";
+                
+                $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
+                $razon=$cliente['razsoc'];
+                $rif=$cliente['rif'];
+                $arreglo_fecha=explode('/',$value['fechsit']);
+                $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
+                $datos[]=
+                array(
+                        'razsoc'    =>$razon,
+                        'rif'       =>$rif,
+                        'numdoc'    =>$value['numdoc'],
+                        'docref'    =>$value['docref'],
+                        'control'    =>$value['control'],
+                        'fecemi'    =>$value['fechsit'],
+                        'base'      =>$value['monto'],
+                        'monto'      =>$value['monto'],
+                        '%'      =>$value['iva'],
+                        'iva'       =>$value['moniva'],
+                        'retencion' =>$this->tiene_retencion_hische_dideco($value['numdoc'],$mes,$year),
+                        'st'      =>$value['st'],
+                        'fecanul'      =>$value['fecanul'],
+                        'tipo'=>'RET',
+                        'orden_fecha'=>$orden_fecha
+
+                        );
+            }
+        }
+    return $datos;
+}
+function get_doc_hiscpc_dideco($numdoc,$tipdoc){
+    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '$tipdoc' AND `numdoc` LIKE '$numdoc'";
+    $query=$this->db->query($sql);
+    $data=$query->result_array();
+        if(count($data)>0){
+            return $data;
+        }else{
+            return FALSE;
         }
 }
 
@@ -63,6 +104,8 @@ function get_nota_credito_dideco($mes,$year){
         $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '8' AND `fecemi` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
         $query2=$this->db->query($sql2);
         $sql_temp_iva=$query2->result_array();
+                $arreglo_fecha=explode('/',$value['fecemi']);
+                $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
         $datos[]=array(
                         'razsoc'    =>$razon,
                         'rif'       =>$rif,
@@ -75,7 +118,9 @@ function get_nota_credito_dideco($mes,$year){
                         'iva'       =>$sql_temp_iva[0]['monto'],
                         'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
                         'st'      =>$value['st'],
-                        'tipo'=>'NC'
+                        'fecanul'      =>$value['fecanul'],
+                        'tipo'=>'NC',
+                        'orden_fecha'=>$orden_fecha
 
                         );
     }
@@ -96,6 +141,8 @@ function get_nota_debito_dideco($mes,$year){
         $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
         $query2=$this->db->query($sql2);
         $sql_temp_iva=$query2->result_array();
+                $arreglo_fecha=explode('/',$value['fecemi']);
+                $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
         $datos[]=array(
                         'razsoc'    =>$razon,
                         'rif'       =>$rif,
@@ -108,7 +155,9 @@ function get_nota_debito_dideco($mes,$year){
                         'iva'       =>$sql_temp_iva[0]['monto'],
                         'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
                         'st'      =>$value['st'],
-                        'tipo'=>'ND'
+                        'fecanul'      =>$value['fecanul'],
+                        'tipo'=>'ND',
+                        'orden_fecha'=>$orden_fecha
 
                         );
     }
@@ -126,7 +175,9 @@ function get_nota_debito_hische_dideco($mes,$year){
         $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,'001' );
         $razon=$cliente['razsoc'];
         $rif=$cliente['rif'];
-        //var_dump($sql); exit();
+        //var_dump($sql); exit();        
+                $arreglo_fecha=explode('/',$value['fecemi']);
+                $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
         $datos[]=array(
                         'razsoc'    =>$razon,
                         'rif'       =>$rif,
@@ -139,7 +190,9 @@ function get_nota_debito_hische_dideco($mes,$year){
                         'iva'       =>$value['moniva'],
                         'retencion' =>$this->tiene_retencion_hische_dideco($value['numdoc'],$mes,$year),
                         'st'      =>$value['st'],
-                        'tipo'=>'ND'
+                        'tipo'=>'ND',
+                        'fecanul'      =>$value['fecanul'],
+                        'orden_fecha'=>$orden_fecha
 
                         );
     }

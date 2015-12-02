@@ -10,7 +10,7 @@ $this->load->view('html/footer2');
 public function pruebas(){
 	$this->load->model('data_complemento');
 
-	$notas_credito=$this->data_complemento->get_nota_credito_dideco('10','15');
+	$notas_credito=$this->data_complemento->get_ret_fuera_mes_dideco('10','15');
 	echo "<pre>";
 	var_dump($notas_credito);
 	echo "</pre>";
@@ -152,6 +152,9 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	$notas_credito=$this->data_complemento->get_nota_credito_dideco($mes,$year);
 	$notas_debito=$this->data_complemento->get_nota_debito_dideco($mes,$year);
 	$notas_debito_hische=$this->data_complemento->get_nota_debito_hische_dideco($mes,$year);
+	$ret_fuera_de_mes=$this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
+	
+
 	$pdf = new PDF('L','mm','Legal');
 	$pdf->SetMargins(5,5,5);   
 	$pdf->AliasNbPages(); 
@@ -160,25 +163,33 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	
 		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF','RIF','RAZON'); 
 		$datos=null;
-    	foreach ($fac_ventas as $key => $value) {
-    		
-/*
+    	//foreach ($fac_ventas as $key => $value) {
+    		/*
     		$tiene_retencion_en_mes=$this->data_complemento->tiene_retencion_en_mes_dideco($value['numdoc'],$mes,$year);
     		if($tiene_retencion_en_mes){
     			//var_dump($tiene_retencion_en_mes); exit();
     			$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'],'control_comprobante'=>$tiene_retencion_en_mes[0]['control'],'fecemi_comprobante'=>$tiene_retencion_en_mes[0]['fecemi'],'monto_retenido'=>$tiene_retencion_en_mes[0]['monto']);
     		}else{
     				$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'] );		
-    		}*/
-    	}
+    		}
+    		*/
+    	
+    	//}
 
     	/*Recorrido de NOTAS DE CREDITO*/
     	/*FIN de NOTAS DE CREDITO*/
     #$pdf->tabla_libro_ventas($notas_credito,$mes,$year);
     	//var_dump($notas_debito); echo count($notas_debito); exit();
-    	$todos_datos=array_merge((array)$notas_credito,(array)$notas_debito,(array)$notas_debito_hische,(array)$this->data_complemento->get_fac_ventas_dideco($mes,$year) );
+    	$todos_datos=array_merge(
+    								(array)$notas_credito,
+    								(array)$notas_debito,
+    								(array)$notas_debito_hische,
+    								(array)$fac_ventas,
+    								(array)$ret_fuera_de_mes
+    							 );
     	//var_dump($todos_datos); exit();
-    	$orden=$pdf->array_orderby($todos_datos, "numdoc",SORT_ASC);
+    	//$orden=$pdf->array_orderby($todos_datos, "numdoc",SORT_ASC);
+    	$orden=$pdf->array_orderby($todos_datos, "orden_fecha",SORT_ASC);
     	$pdf->tabla_libro_ventas($orden,$mes,$year);
 	    # TRABAJANDO AUN EN FUNCION $this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
 	    	/*if(count($notas_debito)>0 && $notas_debito!=NULL){

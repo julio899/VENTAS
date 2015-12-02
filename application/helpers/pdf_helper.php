@@ -379,13 +379,13 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->SetLineWidth(.2);//->grosor de linea Verticales
     $this->SetFont('','B',7);
 
-    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','STATUS'); 
+    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','FECHA DE','TIPO DE'); 
     for($i=0;$i<count($header);$i++){
 
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
-    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','REFER.','RETENCION','RETENCION IVA','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO',''); 
+    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','AFECT','RETENC.','DE RETENCION','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO','ANULACION','DOC.'); 
     for($i=0;$i<count($header);$i++){
 
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
@@ -418,7 +418,7 @@ function array_orderby()
 function tabla_libro_ventas($data,$mes,$year){
 
     // Header
-    $w = array(8,13, 10,15, 15,15,15,15,22,17,85,17,17,17,7,17,17,15);
+    $w = array(8,13, 10,15, 15,10,11,13,22,17,85,17,17,17,7,17,17,15,13);
     $x=5;
     // Data
     $fill = false;
@@ -430,15 +430,30 @@ function tabla_libro_ventas($data,$mes,$year){
         if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);  }
 
         $this->Cell($w[0],3,$c+1,'LR',0,'C',$fill);
-        $this->Cell($w[1],3,$data[$c]['fecemi'],'LR',0,'C',$fill);
+        # LA FECHA SE MUESTRA FECHSIT EN CASO DE RETENCION FUERA DE MES
+          $this->Cell($w[1],3,$data[$c]['fecemi'],'LR',0,'C',$fill);
+                    
+        
         # SI ES UNA FACTURA
         if($data[$c]['tipo']=='FAC'){
             $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
-        }else{
+        }
+        # en caso de ser NOTA de DEBIO o Credito
+        if($data[$c]['tipo']=='ND'||$data[$c]['tipo']=='NC'||$data[$c]['tipo']=='RET'){
             $this->Cell($w[2],3,'','LR',0,'C',$fill);//COLUMNA Nro DOC
 
             }
-        $this->Cell($w[3],3,$data[$c]['control'],'LR',0,'C',$fill);
+        # SI ES UNA RETENCION FUERA DEL MES
+        /*if($data[$c]['tipo']=='RET'){
+            $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
+        }*/
+        
+            # imprimo el control si no es una retencion
+            if($data[$c]['tipo']!='RET'){
+                $this->Cell($w[3],3,$data[$c]['control'],'LR',0,'C',$fill);
+            }else{
+                $this->Cell($w[3],3,'','LR',0,'C',$fill);
+                }
             # si tipo es NC (NOTA de CREDITO)
              if($data[$c]['tipo']=='NC'){
                     $this->Cell($w[4],3,$data[$c]['numdoc'],'LR',0,'C',$fill);
@@ -465,31 +480,56 @@ function tabla_libro_ventas($data,$mes,$year){
                 $this->Cell($w[7],3,$data[$c]['retencion'][0]['fecemi'],'LR',0,'C',$fill);
                 $this->Cell($w[8],3,$data[$c]['retencion'][0]['control'],'LR',0,'C',$fill);
             }else{
-                $this->Cell($w[7],3,'','LR',0,'C',$fill);
-                $this->Cell($w[8],3,'','LR',0,'C',$fill);
+                 if($data[$c]['tipo']=='RET'){
+                    $this->Cell($w[7],3,$data[$c]['fecemi'],'LR',0,'C',$fill);
+                    $this->Cell($w[8],3,$data[$c]['control'],'LR',0,'C',$fill);
+                }else{
+
+                        $this->Cell($w[7],3,'','LR',0,'C',$fill);
+                        $this->Cell($w[8],3,'','LR',0,'C',$fill);   
+                }
             }   
 
         $this->Cell($w[9],3,$data[$c]['rif'],'LR',0,'C',$fill);
         $this->Cell($w[10],3,$data[$c]['razsoc'],'LR',0,'L',$fill);
-        $this->Cell($w[11],3,$data[$c]['base']+$data[$c]['iva'],'LR',0,'R',$fill);//MONTO CON IVA
+        if($data[$c]['tipo']=='RET'){
+                         $this->Cell($w[11],3,'','LR',0,'R',$fill);//MONTO CON IVA
+                 }else{
+                        $this->Cell($w[11],3,$data[$c]['base']+$data[$c]['iva'],'LR',0,'R',$fill);//MONTO CON IVA
+                 }
         $this->Cell($w[12],3,'','LR',0,'R',$fill);//EXCENTO
-        $this->Cell($w[13],3,$data[$c]['base'],'LR',0,'R',$fill);//BASE
+                    # si es RET suelta no se coloca base
+                 if($data[$c]['tipo']=='RET'){
+                         $this->Cell($w[13],3,'','LR',0,'R',$fill);//BASE
+                 }else{
+                         $this->Cell($w[13],3,$data[$c]['base'],'LR',0,'R',$fill);//BASE
+                 }
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
         $this->Cell($w[15],3,$data[$c]['iva'],'LR',0,'R',$fill);// IVA
         #en caso que tenga retencion
             if($data[$c]['retencion']){
                     $this->Cell($w[16],3,trim($data[$c]['retencion'][0]['monto']),'LR',0,'C',$fill);
             }else{
-                    $this->Cell($w[16],3,'','LR',0,'C',$fill);
+                    if($data[$c]['tipo']=='RET'){
+                        $this->Cell($w[16],3,trim($data[$c]['monto']),'LR',0,'R',$fill);
+                    }else{
+                        $this->Cell($w[16],3,'','LR',0,'C',$fill);   
+                    }
 
             }
         #en CASO de ANULACION
             if($data[$c]['st']=='A'){
-                
-                $this->Cell($w[17],3,'ANULADO'.$data[$c]['tipo'],'LR',0,'C',$fill);
+                    $fecha=$data[$c]['fecanul'];
+                    $y=substr($fecha, 0,4);
+                    $m=substr($fecha, 4,2);
+                    $d=substr($fecha, -2,2);
+                $this->Cell($w[17],3,$d.'/'.$m.'/'.$y,'LR',0,'C',$fill);
             }else{
-                $this->Cell($w[17],3,''.$data[$c]['tipo'],'LR',0,'C',$fill);
+                $this->Cell($w[17],3,'','LR',0,'C',$fill);
             }
+                $this->Cell($w[18],3,$data[$c]['tipo'],'LR',0,'C',$fill);
+
+
 
         $this->Ln(); $fill = !$fill;
 
