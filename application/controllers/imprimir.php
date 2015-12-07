@@ -153,6 +153,8 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	$notas_debito=$this->data_complemento->get_nota_debito_dideco($mes,$year);
 	$notas_debito_hische=$this->data_complemento->get_nota_debito_hische_dideco($mes,$year);
 	$ret_fuera_de_mes=$this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
+	$ret_imp_srl=$this->data_complemento->get_ret_imp_slr($mes,$year);
+	$impuesto_municipal=$this->data_complemento->get_ret_imp_muni($mes,$year);
 	
 
 	$pdf = new PDF('L','mm','Legal');
@@ -185,12 +187,15 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     								(array)$notas_debito,
     								(array)$notas_debito_hische,
     								(array)$fac_ventas,
-    								(array)$ret_fuera_de_mes
+    								(array)$ret_fuera_de_mes,
+    								(array)$ret_imp_srl,
+    								(array)$impuesto_municipal
     							 );
-    	//var_dump($todos_datos); exit();
+    	//var_dump($fac_ventas); exit();
     	//$orden=$pdf->array_orderby($todos_datos, "numdoc",SORT_ASC);
     	$orden=$pdf->array_orderby($todos_datos, "orden_fecha",SORT_ASC);
-    	$pdf->tabla_libro_ventas($orden,$mes,$year);
+    	//$pdf->tabla_libro_ventas($todos_datos,$mes,$year);
+	    $pdf->tabla_libro_ventas($orden,$mes,$year);
 	    # TRABAJANDO AUN EN FUNCION $this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
 	    	/*if(count($notas_debito)>0 && $notas_debito!=NULL){
 	    		$pdf->tabla_libro_ventas($notas_debito,$mes,$year);
