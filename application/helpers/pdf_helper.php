@@ -424,7 +424,10 @@ function tabla_libro_ventas($data,$mes,$year){
     $fill = false;
     $this->SetFont('Courier','',10);
     # ACUMULADORES
-    $retenciones=0;$notas_credito=0; $IVA_notas_credito=0;
+    $retenciones=0;
+    $notas_credito=0; $IVA_notas_credito=0;
+    $notas_debito=0; $IVA_notas_debito=0;
+    $ventas_contado=0; $ventas_credito=0;
 
     $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
         for($c=0 ; $c < count($data) ; $c++)
@@ -438,12 +441,21 @@ function tabla_libro_ventas($data,$mes,$year){
         
         # SI ES UNA FACTURA
         if($data[$c]['tipo']=='FAC'){
-            $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
+            if(trim($data[$c]['condi'])==0){
+            $this->Cell($w[2],3,$data[$c]['numdoc'].'*','LR',0,'C',$fill);//COLUMNA Nro DOC    
+            
+            }else{
+                $this->Cell($w[2],3,$data[$c]['numdoc'].'+','LR',0,'C',$fill);//COLUMNA Nro DOC
+
+            }
         }
         # en caso de ser NOTA de DEBIO o Credito
         if($data[$c]['tipo']=='ND'||$data[$c]['tipo']=='NC'||$data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
             $this->Cell($w[2],3,'','LR',0,'C',$fill);//COLUMNA Nro DOC
-
+                if($data[$c]['tipo']=='ND'){ 
+                                                $notas_debito+=($data[$c]['base']-$data[$c]['iva']);
+                                                $IVA_notas_debito+=$data[$c]['iva'];
+                                             } 
             }
         # SI ES UNA RETENCION FUERA DEL MES
         /*if($data[$c]['tipo']=='RET'){
@@ -497,11 +509,12 @@ function tabla_libro_ventas($data,$mes,$year){
         if($data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
                          $this->Cell($w[11],3,'','LR',0,'R',$fill);//MONTO CON IVA
                  }else{
-                        $this->Cell($w[11],3,$data[$c]['base']+$data[$c]['iva'],'LR',0,'R',$fill);//MONTO CON IVA
+                        $this->Cell($w[11],3,number_format($data[$c]['base']+$data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA
                  }
         #para los exentos
         if(isset($data[$c]['exento'])){
             $this->Cell($w[12],3,$data[$c]['exento'],'LR',0,'R',$fill);//EXCENTO
+            //$this->Cell($w[12],3,$data[$c]['orden_fecha'],'LR',0,'R',$fill);//EXCENTO
         }else{
             $this->Cell($w[12],3,'','LR',0,'R',$fill);//EXCENTO
         }
@@ -510,8 +523,19 @@ function tabla_libro_ventas($data,$mes,$year){
                     # si es RET suelta no se coloca base
                  if($data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
                          $this->Cell($w[13],3,'','LR',0,'R',$fill);//BASE
-                 }else{     if($data[$c]['tipo']=='NC'){$notas_credito+=$data[$c]['base'];} //ACUMULADOR para NC
-                         $this->Cell($w[13],3,number_format($data[$c]['base'],2,',','.'),'LR',0,'R',$fill);//BASE
+                 }else{     
+                        if($data[$c]['tipo']=='NC'){$notas_credito+=$data[$c]['base'];} //ACUMULADOR para NC
+                        if($data[$c]['tipo']=='FAC' && $data[$c]['st']!='A'){
+                                                        if(trim($data[$c]['condi'])==0){  
+                                                                                            $ventas_contado+=$data[$c]['base']; 
+                                                                                        }else{
+                                                                                            $ventas_credito+=$data[$c]['base'];
+                                                                                                }
+                                                     
+                                                    } //ACUMULADOR para NC
+                        $base_temp=$data[$c]['base'];
+                        if($data[$c]['tipo']=='ND'){$base_temp=$data[$c]['base']-$data[$c]['iva'];}
+                        $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
                  }
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
         $this->Cell($w[15],3,$data[$c]['iva'],'LR',0,'R',$fill);// IVA
@@ -554,6 +578,10 @@ function tabla_libro_ventas($data,$mes,$year){
     $this->SetFont('Courier','B',12);
     $retenciones=str_replace('-', '', $retenciones);
     $this->Write(5,'Monto en Retenciones.....: '.number_format($retenciones,2,',','.')); $this->Ln();
+    $this->Write(5,'ND) IVA en NOTAS de DEBITO   : '.number_format($IVA_notas_debito,2,',','.')); $this->Ln();
+    $this->Write(5,'ND) Monto en NOTAS de DEBITO : '.number_format($notas_debito,2,',','.')); $this->Ln();
+    $this->Write(5,'FAC a CONTADO) Monto VENTAS  : '.number_format($ventas_contado,2,',','.')); $this->Ln();
+    $this->Write(5,'FAC a CREDITO) Monto VENTAS  : '.number_format($ventas_credito,2,',','.')); $this->Ln();
     $this->Write(5,'Monto en Notas de Credito: '.number_format($notas_credito,2,',','.').'     IVA de Notas de Credito: '.$IVA_notas_credito); $this->Ln();
 }
 

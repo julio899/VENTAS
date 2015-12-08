@@ -148,7 +148,11 @@ public function pie_pag($pdf){
 public function imp_fac_ventas_dideco($mes="",$year=""){
 	$this->load->helper('pdf');
 	$this->load->model('data_complemento');
+	$pdf = new PDF('L','mm','Legal');
+
+
 	$fac_ventas=$this->data_complemento->get_fac_ventas_dideco($mes,$year);	
+	$fac_ventas_02_cpc=$this->data_complemento->get_fac_ventas_02_cpc_dideco($mes,$year);
 	$notas_credito=$this->data_complemento->get_nota_credito_dideco($mes,$year);
 	$notas_debito=$this->data_complemento->get_nota_debito_dideco($mes,$year);
 	$notas_debito_hische=$this->data_complemento->get_nota_debito_hische_dideco($mes,$year);
@@ -156,11 +160,13 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	$ret_imp_srl=$this->data_complemento->get_ret_imp_slr($mes,$year);
 	$impuesto_municipal=$this->data_complemento->get_ret_imp_muni($mes,$year);
 	
+	$FACTURAS=array_merge( (array)	$fac_ventas,(array)	$fac_ventas_02_cpc );
+	$FACTURAS=$pdf->array_orderby($FACTURAS, "numdoc",SORT_ASC);
 
-	$pdf = new PDF('L','mm','Legal');
 	$pdf->SetMargins(5,5,5);   
 	$pdf->AliasNbPages(); 
 	$pdf->AddPage();
+
 	//$this->menbrete_fac_ventas($pdf,$mes,$year);
 	
 		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF','RIF','RAZON'); 
@@ -181,12 +187,14 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     	/*Recorrido de NOTAS DE CREDITO*/
     	/*FIN de NOTAS DE CREDITO*/
     #$pdf->tabla_libro_ventas($notas_credito,$mes,$year);
-    	//var_dump($notas_debito); echo count($notas_debito); exit();
+    	//var_dump($notas_debito_hische[3]);  exit();
     	$todos_datos=array_merge(
     								(array)$notas_credito,
     								(array)$notas_debito,
     								(array)$notas_debito_hische,
-    								(array)$fac_ventas,
+    								//(array)$fac_ventas,
+    								//(array)$fac_ventas_02_cpc,
+    								//(array)$FACTURAS,
     								(array)$ret_fuera_de_mes,
     								(array)$ret_imp_srl,
     								(array)$impuesto_municipal
@@ -195,7 +203,8 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     	//$orden=$pdf->array_orderby($todos_datos, "numdoc",SORT_ASC);
     	$orden=$pdf->array_orderby($todos_datos, "orden_fecha",SORT_ASC);
     	//$pdf->tabla_libro_ventas($todos_datos,$mes,$year);
-	    $pdf->tabla_libro_ventas($orden,$mes,$year);
+    	$union=array_merge((array)$orden,(array)$FACTURAS);
+	    $pdf->tabla_libro_ventas($union,$mes,$year);
 	    # TRABAJANDO AUN EN FUNCION $this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
 	    	/*if(count($notas_debito)>0 && $notas_debito!=NULL){
 	    		$pdf->tabla_libro_ventas($notas_debito,$mes,$year);
