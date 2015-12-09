@@ -145,6 +145,14 @@ public function pie_pag($pdf){
     	$pdf->Cell(10,10,'Pagina '.$pdf->PageNo().'/{nb}',0,0,'C');$pdf->Ln();
 }
 
+public function nd($mes="",$year=""){
+	$this->load->model('data_complemento');
+	$notas_debito_hische=$this->data_complemento->get_nota_debito_hische_dideco($mes,$year);
+	$notas_debito=$this->data_complemento->get_nota_debito_dideco($mes,$year);
+	var_dump($notas_debito_hische);
+		
+}
+
 public function imp_fac_ventas_dideco($mes="",$year=""){
 	$this->load->helper('pdf');
 	$this->load->model('data_complemento');

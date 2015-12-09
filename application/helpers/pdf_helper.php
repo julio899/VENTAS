@@ -611,9 +611,8 @@ function tabla_libro_ventas($data,$mes,$year){
     $this->detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito );
 }
 
-function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito ){
-     //$this->Write(2,"#".$this->GetY());
-    //$this->TableFantacy($header, $data);
+function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito )
+{
     $TOTAL_IVA=$IVA_ventas_contado+$IVA_ventas_credito+$IVA_notas_debito+$IVA_notas_credito;
     $TOTAL_BASES=$ventas_credito+$ventas_contado+$notas_debito+$notas_credito;
     $contenido=array(
@@ -623,8 +622,8 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
                         array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito,2,',','.'),number_format($IVA_notas_credito,2,',','.'),'0.00',number_format($notas_credito+$IVA_notas_credito,2,',','.')),
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
                         array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),'0.00',number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
-                        array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','',number_format( $retenciones,2,',','.'),'',''),
-                        array('TOTAL RETENCIONES ISLR','',number_format( $retenciones_islr,2,',','.'),'','')
+                        array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
+                        array('TOTAL RETENCIONES ISLR','','','',number_format( $retenciones_islr,2,',','.'))
                     );
     // Header
     $w = array(120,40,40,40,40);
@@ -708,13 +707,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
 
 
     $this->Cell(array_sum($w),0,'','T');
-    /*
-    $this->Write(5,'FAC a CREDITO) Monto VENTAS  : '.number_format($ventas_credito,2,',','.')."\t\t\tIVA CREDITO: ".number_format($IVA_ventas_credito,2,',','.') ); $this->Ln();
-    $this->Write(5,'FAC a CONTADO) Monto VENTAS  : '.number_format($ventas_contado,2,',','.')."\t\tIVA CONTADO: ".number_format($IVA_ventas_contado,2,',','.') ); $this->Ln();
-    $this->Write(5,'ND) Monto en NOTAS de DEBITO : '.number_format($notas_debito,2,',','.')  ."\t\t\t\t\t\t\t\t\tIVA en ND..: ".number_format($IVA_notas_debito,2,',','.')); $this->Ln();
-    $this->Write(5,'NC) Monto en Notas de CREDITO: '.number_format($notas_credito,2,',','.') ."\t\t\t\tIVA de NC......: ".number_format($IVA_notas_credito,2,',','.') ); $this->Ln();
-    $this->Write(5,'Monto en Retenciones.........: '.number_format($retenciones,2,',','.')); $this->Ln();
-  */    
+        
 }
 
 function Tabla_fac_ventas($header, $data,$mes,$year)
