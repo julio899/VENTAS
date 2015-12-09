@@ -3,6 +3,7 @@
  class PDF extends FPDF
 {
 public $compaTXT;
+public $final=FALSE;
 // Load data
 function LoadData($file)
 {
@@ -365,7 +366,7 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->Cell(0,4,$this->txt_mes($mes).' - 20'.$year,0,0,'C');
        // $this->Ln();
     //$this->Cell(0,3, ,0,0,'C');
-    $this->SetX(288);
+    $this->SetX(285);
     $this->Write(2,'Emitido el '.date('d/m/Y h:i A').' * Pagina '.$this->PageNo().'/{nb}'); 
     $this->SetX(0);    
         $this->Ln(); 
@@ -378,8 +379,9 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
     $this->SetDrawColor(0,0,0);//128,0,0->Rojo
     $this->SetLineWidth(.2);//->grosor de linea Verticales
     $this->SetFont('','B',7);
-
+    if($this->final!=TRUE){
     $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','FECHA DE','TIPO DE'); 
+
     for($i=0;$i<count($header);$i++){
 
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
@@ -391,7 +393,8 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
      $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
        }   
     $this->Ln();
-    
+    }// fin de if($final) si es final que no imprima el encabzado de esta pagina
+
     // Color and font restoration
     $this->SetFillColor(224,235,255);
     $this->SetTextColor(0);
@@ -427,7 +430,9 @@ function tabla_libro_ventas($data,$mes,$year){
     $retenciones=0;
     $notas_credito=0; $IVA_notas_credito=0;
     $notas_debito=0; $IVA_notas_debito=0;
-    $ventas_contado=0; $ventas_credito=0;
+    $ventas_contado=0; $IVA_ventas_contado=0; 
+    $ventas_credito=0; $IVA_ventas_credito=0;
+    $retenciones_islr=0;
 
     $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
         for($c=0 ; $c < count($data) ; $c++)
@@ -452,7 +457,7 @@ function tabla_libro_ventas($data,$mes,$year){
         # en caso de ser NOTA de DEBIO o Credito
         if($data[$c]['tipo']=='ND'||$data[$c]['tipo']=='NC'||$data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
             $this->Cell($w[2],3,'','LR',0,'C',$fill);//COLUMNA Nro DOC
-                if($data[$c]['tipo']=='ND'){ 
+                if($data[$c]['tipo']=='ND'&& $data[$c]['st']!='A'){ 
                                                 $notas_debito+=($data[$c]['base']-$data[$c]['iva']);
                                                 $IVA_notas_debito+=$data[$c]['iva'];
                                              } 
@@ -512,7 +517,8 @@ function tabla_libro_ventas($data,$mes,$year){
                         $this->Cell($w[11],3,number_format($data[$c]['base']+$data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA
                  }
         #para los exentos
-        if(isset($data[$c]['exento'])){
+        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
+
             $this->Cell($w[12],3,$data[$c]['exento'],'LR',0,'R',$fill);//EXCENTO
             //$this->Cell($w[12],3,$data[$c]['orden_fecha'],'LR',0,'R',$fill);//EXCENTO
         }else{
@@ -524,12 +530,14 @@ function tabla_libro_ventas($data,$mes,$year){
                  if($data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
                          $this->Cell($w[13],3,'','LR',0,'R',$fill);//BASE
                  }else{     
-                        if($data[$c]['tipo']=='NC'){$notas_credito+=$data[$c]['base'];} //ACUMULADOR para NC
+                        if($data[$c]['tipo']=='NC'&& $data[$c]['st']!='A'){$notas_credito+=$data[$c]['base'];} //ACUMULADOR para NC
                         if($data[$c]['tipo']=='FAC' && $data[$c]['st']!='A'){
                                                         if(trim($data[$c]['condi'])==0){  
-                                                                                            $ventas_contado+=$data[$c]['base']; 
+                                                                                            $ventas_contado+=$data[$c]['base'];
+                                                                                            $IVA_ventas_contado+=$data[$c]['iva'];
                                                                                         }else{
                                                                                             $ventas_credito+=$data[$c]['base'];
+                                                                                            $IVA_ventas_credito+=$data[$c]['iva'];
                                                                                                 }
                                                      
                                                     } //ACUMULADOR para NC
@@ -540,16 +548,28 @@ function tabla_libro_ventas($data,$mes,$year){
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
         $this->Cell($w[15],3,$data[$c]['iva'],'LR',0,'R',$fill);// IVA
             #ACUMULADORES DE IVA SEGUN EL TIPO
-            if($data[$c]['tipo']=='NC'){$IVA_notas_credito+=$data[$c]['iva'];}
+            if($data[$c]['tipo']=='NC'&& $data[$c]['st']!='A'){$IVA_notas_credito+=$data[$c]['iva'];}
 
         #en caso que tenga retencion
             if($data[$c]['retencion']){
-                    $retenciones+=$data[$c]['retencion'][0]['monto'];
+                    #acumulador de reencion en caso que no este anulada
+                    if($data[$c]['st']!='A'){
+                        if($data[$c]['tipo']=='RISL'){
+                                $retenciones_islr+=$data[$c]['retencion'][0]['monto'];   
+                        }else{
+                             $retenciones+=$data[$c]['retencion'][0]['monto'];   
+                            }                         
+                    }
+
                     $this->Cell($w[16],3,number_format(trim($data[$c]['retencion'][0]['monto']),2,',','.') ,'LR',0,'R',$fill);
             }else{
                     if($data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
                         //$cant_ret=str_replace(',', '.', $data[$c]['monto']);
-                        $retenciones+=$data[$c]['monto'];
+                        if($data[$c]['tipo']=='RISL'){
+                                $retenciones_islr+=$data[$c]['monto'];   
+                        }else{
+                                $retenciones+=$data[$c]['monto'];
+                        }
                         $this->Cell($w[16],3,$data[$c]['monto'],'LR',0,'R',$fill);
                     }else{
                         $this->Cell($w[16],3,'','LR',0,'C',$fill);   
@@ -577,12 +597,124 @@ function tabla_libro_ventas($data,$mes,$year){
     $this->Cell(array_sum($w),0,'','T');
     $this->SetFont('Courier','B',12);
     $retenciones=str_replace('-', '', $retenciones);
-    $this->Write(5,'Monto en Retenciones.....: '.number_format($retenciones,2,',','.')); $this->Ln();
-    $this->Write(5,'ND) IVA en NOTAS de DEBITO   : '.number_format($IVA_notas_debito,2,',','.')); $this->Ln();
-    $this->Write(5,'ND) Monto en NOTAS de DEBITO : '.number_format($notas_debito,2,',','.')); $this->Ln();
-    $this->Write(5,'FAC a CONTADO) Monto VENTAS  : '.number_format($ventas_contado,2,',','.')); $this->Ln();
-    $this->Write(5,'FAC a CREDITO) Monto VENTAS  : '.number_format($ventas_credito,2,',','.')); $this->Ln();
-    $this->Write(5,'Monto en Notas de Credito: '.number_format($notas_credito,2,',','.').'     IVA de Notas de Credito: '.$IVA_notas_credito); $this->Ln();
+    /*
+    $this->Write(5,'FAC a CREDITO) Monto VENTAS  : '.number_format($ventas_credito,2,',','.')."\t\t\tIVA CREDITO: ".number_format($IVA_ventas_credito,2,',','.') ); $this->Ln();
+    $this->Write(5,'FAC a CONTADO) Monto VENTAS  : '.number_format($ventas_contado,2,',','.')."\t\tIVA CONTADO: ".number_format($IVA_ventas_contado,2,',','.') ); $this->Ln();
+    $this->Write(5,'ND) Monto en NOTAS de DEBITO : '.number_format($notas_debito,2,',','.')  ."\t\t\t\t\t\t\t\t\tIVA en ND..: ".number_format($IVA_notas_debito,2,',','.')); $this->Ln();
+    $this->Write(5,'NC) Monto en Notas de CREDITO: '.number_format($notas_credito,2,',','.') ."\t\t\t\tIVA de NC......: ".number_format($IVA_notas_credito,2,',','.') ); $this->Ln();
+    $this->Write(5,'Monto en Retenciones.........: '.number_format($retenciones,2,',','.')); $this->Ln();
+   */ 
+
+     if($this->GetY()>141){ $this->final=TRUE;
+                            $this->AddPage(); $this->membrete_Tabla_fac_ventas($w,$mes,$year);
+                            }
+    $this->detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito );
+}
+
+function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito ){
+     //$this->Write(2,"#".$this->GetY());
+    //$this->TableFantacy($header, $data);
+    $TOTAL_IVA=$IVA_ventas_contado+$IVA_ventas_credito+$IVA_notas_debito+$IVA_notas_credito;
+    $TOTAL_BASES=$ventas_credito+$ventas_contado+$notas_debito+$notas_credito;
+    $contenido=array(
+                        array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),'0.00',number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
+                        array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),'0.00',number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
+                        array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
+                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito,2,',','.'),number_format($IVA_notas_credito,2,',','.'),'0.00',number_format($notas_credito+$IVA_notas_credito,2,',','.')),
+                        array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
+                        array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),'0.00',number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
+                        array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','',number_format( $retenciones,2,',','.'),'',''),
+                        array('TOTAL RETENCIONES ISLR','',number_format( $retenciones_islr,2,',','.'),'','')
+                    );
+    // Header
+    $w = array(120,40,40,40,40);
+    $this->SetFillColor(50,50,50); // 255 0 0 >ROJO
+    $this->SetTextColor(255); // 255-> BLANCO
+    $this->SetDrawColor(0,0,0);//128,0,0->Rojo
+    $this->SetLineWidth(.2);//->grosor de linea Verticales
+    $header=array(strtoupper('Descripcion'),'Monto Gravable','IVA','Monto Exento','Monto TOTAL'); 
+    $x=5;
+    $this->SetX($x);
+    $this->SetY($this->GetY()+10);
+    // Data
+    $this->SetFont('Courier','B',12);
+
+        foreach ($header as $key=>$value) {
+                $this->Cell($w[$key],7,$value,'LR',0,'C',true);
+        }
+        $this->Ln();
+
+    $this->SetFont('Courier','',12);
+        #CIERRE DE CABECERA
+        #INICIO de CONTENIDO
+        $this->SetTextColor(0); // 255-> BLANCO
+        $fill=false;
+            $this->Cell($w[0],5,$contenido[0][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[0][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[0][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[0][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[0][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[1][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[1][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[1][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[1][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[1][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+
+            $this->Cell($w[0],5,$contenido[2][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[2][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[2][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[2][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[2][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[3][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[3][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[3][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[3][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[3][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[4][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[4][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[4][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[4][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[4][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[5][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[5][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[5][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[5][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[5][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[6][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[6][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[6][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[6][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[6][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+            $this->Cell($w[0],5,$contenido[7][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[7][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[7][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[7][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[7][4],'LR',0,'R',$fill);
+            $this->Ln();
+
+
+    $this->Cell(array_sum($w),0,'','T');
+    /*
+    $this->Write(5,'FAC a CREDITO) Monto VENTAS  : '.number_format($ventas_credito,2,',','.')."\t\t\tIVA CREDITO: ".number_format($IVA_ventas_credito,2,',','.') ); $this->Ln();
+    $this->Write(5,'FAC a CONTADO) Monto VENTAS  : '.number_format($ventas_contado,2,',','.')."\t\tIVA CONTADO: ".number_format($IVA_ventas_contado,2,',','.') ); $this->Ln();
+    $this->Write(5,'ND) Monto en NOTAS de DEBITO : '.number_format($notas_debito,2,',','.')  ."\t\t\t\t\t\t\t\t\tIVA en ND..: ".number_format($IVA_notas_debito,2,',','.')); $this->Ln();
+    $this->Write(5,'NC) Monto en Notas de CREDITO: '.number_format($notas_credito,2,',','.') ."\t\t\t\tIVA de NC......: ".number_format($IVA_notas_credito,2,',','.') ); $this->Ln();
+    $this->Write(5,'Monto en Retenciones.........: '.number_format($retenciones,2,',','.')); $this->Ln();
+  */    
 }
 
 function Tabla_fac_ventas($header, $data,$mes,$year)
@@ -595,7 +727,7 @@ function Tabla_fac_ventas($header, $data,$mes,$year)
     // Data
     $fill = false;
 
-$this->SetFont('Courier','',10);
+    $this->SetFont('Courier','',10);
 
 
           $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
@@ -737,9 +869,6 @@ $this->SetFont('Courier','',10);
     $this->Cell(array_sum($w),0,'','T');
 
 
-
-
-
 }
 
 
@@ -767,7 +896,7 @@ function TableDideco($header, $data)
     $fill = false;
     $u=0;
 
-$this->SetFont('Courier','',8);
+    $this->SetFont('Courier','',8);
 
                     $y=32;
                     $x=105;
@@ -816,82 +945,6 @@ $this->SetFont('Courier','',8);
                     $this->ImpNroPaguinaDidecoDeimport();
 }
 
-/* RESPALDO
-    
-
-function Table_Dideco_Deimport($header, $data)
-{
-    // Colors, line width and bold font
-    $this->SetFillColor(255,0,0);
-    $this->SetTextColor(255);
-    $this->SetDrawColor(128,0,0);
-    $this->SetLineWidth(.3);
-    $this->SetFont('','B',8);
-    // Header
-    $w = array(9, 8,8, 70, 10);
-    for($i=0;$i<count($header);$i++){
-     $this->Cell($w[$i],6,$header[$i],1,0,'C',true);
-       }   
-    $this->Ln();
-    // Color and font restoration
-    $this->SetFillColor(224,235,255);
-    $this->SetTextColor(0);
-    $this->SetFont('');
-    // Data
-    $fill = false;
-    $u=0;
-
-$this->SetFont('Courier','',8);
-
-                    $y=32;
-                    $x=105;
-    foreach($data as $row)
-    {
-       $u++;
-                if($u==71){
-                        $this->Cell(array_sum($w),0,'','T');
-                    $this->cabeceraTabla2($header);
-                    $this->SetY($y);
-                    $this->SetX($x);
-                }
-                if($u>71){
-                    $this->SetX($x);
-                }
-
-
-        $this->Cell($w[0],4,$row[0],'LR',0,'C',$fill);
-        $this->Cell($w[1],4,'','LR',0,'C',$fill);
-        $this->Cell($w[2],4,$row[1],'LR',0,'C',$fill);
-        $this->Cell($w[3],4,$row[2],'LR',0,'L',$fill);
-        $this->Cell($w[4],4,$row[3],'LR',0,'C',$fill);
-        $this->Ln();
-
-        $fill = !$fill;
-    }
-
-    //añadiendo los espacios en Blanco
-    if($u<70){
-        for ($o=$u; $o < 70; $o++) { 
-              $this->SetX(5);
-
-                        $this->Cell($w[0],4,'','LR',0,'L',$fill);
-                        $this->Cell($w[1],4,'','LR',0,'L',$fill);
-                        $this->Cell($w[2],4,'','LR',0,'L',$fill);
-                        $this->Cell($w[3],4,'','LR',0,'R',$fill);
-                        $this->Cell($w[4],4,'','LR',0,'R',$fill);
-                        $this->Ln();
-                        $fill = !$fill;
-                }
-
-    }
-    // Closing line
-    $this->Cell(array_sum($w),0,'','T');
-                
-
-                    $this->ImpNroPaguina();
-}
-*/
-
 function TableDeimport($header, $data)
 {
 
@@ -923,7 +976,7 @@ function TableDeimport($header, $data)
     $fill = false;
     $u=0;
 
-$this->SetFont('Courier','',8);
+    $this->SetFont('Courier','',8);
 
                     $y=32;
     foreach($data as $row)
