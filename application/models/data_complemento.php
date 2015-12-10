@@ -31,7 +31,7 @@ function get_fac_ventas_dideco($mes,$year){
                     }else{
                         $exento=$monto_base-($monto_iva/ floatval('0.'.$value['iva']) );
                         
-                        $exento=number_format($exento,2,',','.');
+                        $exento=$exento;
 
                         //$exento=$rsult_o2[0];
                     }
@@ -90,7 +90,7 @@ function get_fac_ventas_02_cpc_dideco($mes,$year){
                     }else{
                         $exento=$monto_base-($monto_iva/ floatval('0.'.$value['iva']) );
                         
-                        $exento=number_format($exento,2,',','.');
+                        $exento=$exento;
 
                         //$exento=$rsult_o2[0];
                     }
@@ -284,14 +284,14 @@ function get_nota_credito_dideco($mes,$year){
             $rsult_o1=explode('.', $rsult_o1);
             $rsult_o2=str_replace('-', '', $monto_base );
             $rsult_o2=explode('.', $rsult_o2);
-            if($rsult_o2[0]==$rsult_o1[0]){
+            if($rsult_o2[0]==$rsult_o1[0]||$rsult_o2[0]<($rsult_o1[0]+1)){
                 $exento=0;
             }else{
                 //$exento=$monto_iva-($monto_base/'0.'.$value['iva']);
 
                         $exento=$monto_base-($monto_iva/ floatval('0.'.$value['iva']) );
                         
-                        $exento=number_format($exento,2,',','.');
+                        $exento=$exento;
             }
 
             //echo $rsult_o1[0]." / ".$rsult_o2[0] ." * ";

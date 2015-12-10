@@ -4,6 +4,12 @@
 {
 public $compaTXT;
 public $final=FALSE;
+public $exentos=0; 
+public $exentos_nc=0;
+public $exentos_nd=0;
+public $exentos_fac_contado=0;
+public $exentos_fac_credito=0;
+
 // Load data
 function LoadData($file)
 {
@@ -435,6 +441,7 @@ function tabla_libro_ventas($data,$mes,$year){
     $ventas_contado=0; $IVA_ventas_contado=0; 
     $ventas_credito=0; $IVA_ventas_credito=0;
     $retenciones_islr=0;
+    $this->exentos=0;
 
     $this->membrete_Tabla_fac_ventas($w,$mes,$year);  
         for($c=0 ; $c < count($data) ; $c++)
@@ -452,7 +459,7 @@ function tabla_libro_ventas($data,$mes,$year){
             $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC    
             
             }else{
-                $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
+            $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
 
             }
         }
@@ -520,8 +527,12 @@ function tabla_libro_ventas($data,$mes,$year){
                  }
         #para los exentos
         if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
-
-            $this->Cell($w[12],3,$data[$c]['exento'],'LR',0,'R',$fill);//EXCENTO
+            if($data[$c]['tipo']=='NC'){$this->exentos_nc+=$data[$c]['exento'];}
+            if($data[$c]['tipo']=='ND'){$this->exentos_nd+=$data[$c]['exento'];}
+            if($data[$c]['tipo']=='FAC'&&trim($data[$c]['condi'])==0){$this->exentos_fac_contado+=$data[$c]['exento'];}
+            if($data[$c]['tipo']=='FAC'&&trim($data[$c]['condi'])!=0){$this->exentos_fac_credito+=$data[$c]['exento'];}
+            $this->exentos+=$data[$c]['exento'];
+            $this->Cell($w[12],3,number_format($data[$c]['exento'],2,',','.'),'LR',0,'R',$fill);//EXCENTO
             //$this->Cell($w[12],3,$data[$c]['orden_fecha'],'LR',0,'R',$fill);//EXCENTO
         }else{
             $this->Cell($w[12],3,'','LR',0,'R',$fill);//EXCENTO
@@ -545,14 +556,26 @@ function tabla_libro_ventas($data,$mes,$year){
                                                     } //ACUMULADOR para NC
                         $base_temp=$data[$c]['base'];
                         if($data[$c]['tipo']=='ND'){$base_temp=$data[$c]['base']-$data[$c]['iva'];}
-                        $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
-                 }
+                        if(isset($data[$c]['exento'])&&trim($data[$c]['exento'])>0){
+
+                               $this->Cell($w[13],3,"",'LR',0,'R',$fill);//BASE
+                 
+                        }else{
+                                $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
+                        }
+                    }
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
-        if(trim($data[$c]['iva'])=='0'){
-            $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
-          }else{
-                $this->Cell($w[15],3,number_format($data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);// IVA
+            if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
+
+                            $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
+            }else{                         
+                        if(trim($data[$c]['iva'])=='0'){
+                            $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
+                          }else{
+                                $this->Cell($w[15],3,number_format($data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);// IVA
+                            }   
             }
+
             #ACUMULADORES DE IVA SEGUN EL TIPO
             if($data[$c]['tipo']=='NC'&& $data[$c]['st']!='A'){$IVA_notas_credito+=$data[$c]['iva'];}
 
@@ -622,12 +645,12 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
     $TOTAL_IVA=$IVA_ventas_contado+$IVA_ventas_credito+$IVA_notas_debito+$IVA_notas_credito;
     $TOTAL_BASES=$ventas_credito+$ventas_contado+$notas_debito+$notas_credito;
     $contenido=array(
-                        array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),'0.00',number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
-                        array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),'0.00',number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
+                        array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),number_format($this->exentos_fac_credito,2,',','.'),number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
+                        array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),number_format($this->exentos_fac_contado,2,',','.'),number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
                         array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
-                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito,2,',','.'),number_format($IVA_notas_credito,2,',','.'),'0.00',number_format($notas_credito+$IVA_notas_credito,2,',','.')),
+                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
-                        array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),'0.00',number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
+                        array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),number_format($this->exentos,2,',','.'),number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
                         array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
                         array('TOTAL RETENCIONES ISLR','','','',$retenciones_islr)
                     );
@@ -717,6 +740,9 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
 
 
     $this->Cell(array_sum($w),0,'','T');
+    $this->Ln();
+    $this->Write(5,"EXENTOS: ".$this->exentos);
+
         
 }
 
