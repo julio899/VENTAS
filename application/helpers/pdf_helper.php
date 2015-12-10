@@ -740,8 +740,8 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
 
 
     $this->Cell(array_sum($w),0,'','T');
-    $this->Ln();
-    $this->Write(5,"EXENTOS: ".$this->exentos);
+    //$this->Ln();
+    //$this->Write(5,"EXENTOS: ".$this->exentos);
 
         
 }
