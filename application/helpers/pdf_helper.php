@@ -359,14 +359,16 @@ function membrete_Tabla_fac_ventas($w,$mes,$year){
         #fuente
         $this->SetFont('Arial','IB',12);
     $this->Cell(0,5,$razon.' - '.$rif.' )',0,0,'C');
-        $this->SetFont('Arial','I',8);
+        $this->SetFont('Arial','IB',9);
         $this->Ln();
     $this->Cell(0,4,'Libro de Ventas',0,0,'C');
         $this->Ln();
     $this->Cell(0,4,$this->txt_mes($mes).' - 20'.$year,0,0,'C');
        // $this->Ln();
     //$this->Cell(0,3, ,0,0,'C');
-    $this->SetX(285);
+
+        $this->SetFont('Arial','I',9);
+    $this->SetX(275);
     $this->Write(2,'Emitido el '.date('d/m/Y h:i A').' * Pagina '.$this->PageNo().'/{nb}'); 
     $this->SetX(0);    
         $this->Ln(); 
@@ -447,10 +449,10 @@ function tabla_libro_ventas($data,$mes,$year){
         # SI ES UNA FACTURA
         if($data[$c]['tipo']=='FAC'){
             if(trim($data[$c]['condi'])==0){
-            $this->Cell($w[2],3,$data[$c]['numdoc'].'*','LR',0,'C',$fill);//COLUMNA Nro DOC    
+            $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC    
             
             }else{
-                $this->Cell($w[2],3,$data[$c]['numdoc'].'+','LR',0,'C',$fill);//COLUMNA Nro DOC
+                $this->Cell($w[2],3,$data[$c]['numdoc'],'LR',0,'C',$fill);//COLUMNA Nro DOC
 
             }
         }
@@ -546,7 +548,11 @@ function tabla_libro_ventas($data,$mes,$year){
                         $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
                  }
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
-        $this->Cell($w[15],3,$data[$c]['iva'],'LR',0,'R',$fill);// IVA
+        if(trim($data[$c]['iva'])=='0'){
+            $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
+          }else{
+                $this->Cell($w[15],3,number_format($data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);// IVA
+            }
             #ACUMULADORES DE IVA SEGUN EL TIPO
             if($data[$c]['tipo']=='NC'&& $data[$c]['st']!='A'){$IVA_notas_credito+=$data[$c]['iva'];}
 
@@ -570,7 +576,7 @@ function tabla_libro_ventas($data,$mes,$year){
                         }else{
                                 $retenciones+=$data[$c]['monto'];
                         }
-                        $this->Cell($w[16],3,$data[$c]['monto'],'LR',0,'R',$fill);
+                        $this->Cell($w[16],3,number_format(trim($data[$c]['monto']),2,',','.'),'LR',0,'R',$fill);
                     }else{
                         $this->Cell($w[16],3,'','LR',0,'C',$fill);   
                     }
@@ -623,7 +629,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
                         array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),'0.00',number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
                         array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
-                        array('TOTAL RETENCIONES ISLR','','','',number_format( $retenciones_islr,2,',','.'))
+                        array('TOTAL RETENCIONES ISLR','','','',$retenciones_islr)
                     );
     // Header
     $w = array(120,40,40,40,40);
@@ -698,12 +704,16 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             $this->Cell($w[4],5,$contenido[6][4],'LR',0,'R',$fill);
             $this->Ln();
 
+            # si islr es 0 no se imprime
+            if(trim($contenido[7][4])!=0){
+
             $this->Cell($w[0],5,$contenido[7][0],'LR',0,'L',$fill);
             $this->Cell($w[1],5,$contenido[7][1],'LR',0,'R',$fill);
             $this->Cell($w[2],5,$contenido[7][2],'LR',0,'R',$fill);
             $this->Cell($w[3],5,$contenido[7][3],'LR',0,'R',$fill);
-            $this->Cell($w[4],5,$contenido[7][4],'LR',0,'R',$fill);
-            $this->Ln();
+            $this->Cell($w[4],5,number_format($contenido[7][4],2,',','.'),'LR',0,'R',$fill);
+            $this->Ln();   
+            }
 
 
     $this->Cell(array_sum($w),0,'','T');

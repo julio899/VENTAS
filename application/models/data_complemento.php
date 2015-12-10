@@ -379,6 +379,10 @@ function get_nota_debito_hische_dideco($mes,$year){
         //var_dump($sql); exit();        
                 $arreglo_fecha=explode('/',$value['fecemi']);
                 $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
+                $consulta_retencion=$this->tiene_retencion_hische_dideco($value['numdoc'],$mes,$year);
+                if(!$consulta_retencion){
+                    $consulta_retencion=$this->tiene_retencion_hische_nd_dideco($value['numdoc']);
+                }
         $datos[]=array(
                         'razsoc'    =>$razon,
                         'rif'       =>$rif,
@@ -389,7 +393,7 @@ function get_nota_debito_hische_dideco($mes,$year){
                         'base'      =>$value['monto'],
                         '%'      =>$value['iva'],
                         'iva'       =>$value['moniva'],
-                        'retencion' =>$this->tiene_retencion_hische_dideco($value['numdoc'],$mes,$year),
+                        'retencion' =>$consulta_retencion,
                         'st'      =>$value['st'],
                         'tipo'=>'ND',
                         'fecanul'      =>$value['fecanul'],
@@ -414,6 +418,17 @@ function tiene_retencion_dideco($numdoc,$mes,$year){
 function tiene_retencion_hische_dideco($numdoc,$mes,$year){
     $this->load->database('dideco',TRUE);
     $sql="SELECT *  FROM `hische` WHERE `tipdoc` LIKE '*' AND `fecanc` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $query=$this->db->query($sql);
+    $respuesta=FALSE;
+    $datos=$query->result_array();
+        if(count($datos)>0){ $respuesta=$datos; }
+    return $respuesta;   
+}
+
+
+function tiene_retencion_hische_nd_dideco($numdoc){
+    $this->load->database('dideco',TRUE);
+    $sql="SELECT *  FROM `hische` WHERE `tipdoc` LIKE '*' AND `docref` LIKE '$numdoc' LIMIT 1";
     $query=$this->db->query($sql);
     $respuesta=FALSE;
     $datos=$query->result_array();
