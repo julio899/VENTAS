@@ -278,7 +278,12 @@ function get_nota_credito_dideco($mes,$year){
                 $arreglo_fecha=explode('/',$value['fecemi']);
                 $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
             $exento=0;
-            $monto_iva=trim($sql_temp_iva[0]['monto']);
+            //var_dump(); exit();
+            if(count($sql_temp_iva)==0){
+                $monto_iva=0;
+            }else{
+                $monto_iva=trim($sql_temp_iva[0]['monto']);
+            }
             $monto_base=trim($value['monto']);
             $rsult_o1=str_replace('-', '', ($monto_iva)/0.12 );
             $rsult_o1=explode('.', $rsult_o1);
@@ -294,13 +299,6 @@ function get_nota_credito_dideco($mes,$year){
                         $exento=$exento;
             }
 
-            //echo $rsult_o1[0]." / ".$rsult_o2[0] ." * ";
-            //var_dump( $rsult_o2[0]==$rsult_o1[0] );
-
-            //echo "<br>exento: $exento<br>";
-            //echo $sql_temp_iva[0]['monto']."<-monto del iva =(".($sql_temp_iva[0]['monto']/0.12).")<br><br>";
-            //echo "tipdoc[8]monto base "; var_dump($value['monto']); echo "<br><hr> = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = <br>";
-           
                 if($key<10){$orden_fecha.=".0".$key;}else{$orden_fecha.=".".$key;}
                 if(substr($orden_fecha, -1,1)=='0'){$orden_fecha.='1';}
         $datos[]=array(
@@ -312,7 +310,8 @@ function get_nota_credito_dideco($mes,$year){
                         'fecemi'    =>$value['fecemi'],
                         'base'      =>$value['monto'],
                         '%'      =>$value['iva'],
-                        'iva'       =>$sql_temp_iva[0]['monto'],
+                        //'iva'       =>$sql_temp_iva[0]['monto'],
+                        'iva'       =>$monto_iva,
                         'retencion' =>$this->tiene_retencion_dideco($value['numdoc'],$mes,$year),
                         'st'      =>$value['st'],
                         'fecanul'      =>$value['fecanul'],

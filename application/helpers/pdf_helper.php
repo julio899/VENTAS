@@ -523,8 +523,19 @@ function tabla_libro_ventas($data,$mes,$year){
         if($data[$c]['tipo']=='RET'||$data[$c]['tipo']=='RISL'){
                          $this->Cell($w[11],3,'','LR',0,'R',$fill);//MONTO CON IVA
                  }else{
-                        $this->Cell($w[11],3,number_format($data[$c]['base']+$data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA
-                 }
+                        //si la BASE (-)menos IVA == BASE es porque la base ya incluye el iva en hische 
+                   $base_comparativa=$data[$c]['base']/'1.'.$data[$c]['%'];
+                   $base_=explode('.',$base_comparativa);
+                   $base_full_comparativa=explode('.',$data[$c]['base']+$data[$c]['iva']); 
+                    if($base_[0]!=$base_full_comparativa[0]&&$data[$c]['tipo']=='ND'){
+                        $this->Cell($w[11],3,number_format($data[$c]['base'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA
+                    }else{
+                        $this->Cell($w[11],3,number_format($data[$c]['base']+$data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA    
+                        //$this->Cell($w[11],3,$base_[0]."/".($base_full_comparativa[0]),'LR',0,'R',$fill);//MONTO CON IVA    
+                        }
+
+
+                    }
         #para los exentos
         if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
             if($data[$c]['tipo']=='NC'){$this->exentos_nc+=$data[$c]['exento'];}
@@ -557,18 +568,37 @@ function tabla_libro_ventas($data,$mes,$year){
                         $base_temp=$data[$c]['base'];
                         if($data[$c]['tipo']=='ND'){$base_temp=$data[$c]['base']-$data[$c]['iva'];}
                         if(isset($data[$c]['exento'])&&trim($data[$c]['exento'])>0){
-
-                               $this->Cell($w[13],3,"",'LR',0,'R',$fill);//BASE
+                                if($data[$c]['tipo']=='FAC'&&isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A' &&$data[$c]['exento']!=$data[$c]['base']){
+                                    // cuando es exento la nd 
+                                      $this->Cell($w[13],3,number_format($data[$c]['base']-$data[$c]['exento'],2,',','.'),'LR',0,'R',$fill);//BASE
                  
-                        }else{
+                                }else{
 
-                                $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
+                                      $this->Cell($w[13],3,"",'LR',0,'R',$fill);//BASE
+                    
+                                }
+                        }else{
+                                # la base en caso que tenga un exento y tambien tenga productos sin exento
+                                if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A' ){
+                                    if ($data[$c]['base']-$data[$c]['exento']==0) {
+                                          $this->Cell($w[13],3,'','LR',0,'R',$fill);//BASE
+                                    }else{
+                                        $this->Cell($w[13],3,number_format($data[$c]['base']-$data[$c]['exento'],2,',','.'),'LR',0,'R',$fill);//BASE
+                                    }
+                                }else{
+                                    $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE   
+                                }
                         }
                     }
         $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
             if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
+                            if($data[$c]['iva']==0){
 
-                            $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
+                                $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
+                            }else{
+
+                                $this->Cell($w[15],3,number_format($data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);// IVA
+                            }
             }else{                         
                         if(trim($data[$c]['iva'])=='0'){
                             $this->Cell($w[15],3,'','LR',0,'R',$fill);// IVA
@@ -651,7 +681,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
                         array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito-$this->exentos_nd,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
                         array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito-$this->exentos_nc,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
-                        array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),number_format($this->exentos,2,',','.'),number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
+                        array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES-$this->exentos ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),number_format($this->exentos,2,',','.'),number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
                         array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
                         array('TOTAL RETENCIONES ISLR','','','',$retenciones_islr)
                     );
