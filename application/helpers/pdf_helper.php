@@ -526,7 +526,7 @@ function tabla_libro_ventas($data,$mes,$year){
                         $this->Cell($w[11],3,number_format($data[$c]['base']+$data[$c]['iva'],2,',','.'),'LR',0,'R',$fill);//MONTO CON IVA
                  }
         #para los exentos
-        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
+        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
             if($data[$c]['tipo']=='NC'){$this->exentos_nc+=$data[$c]['exento'];}
             if($data[$c]['tipo']=='ND'){$this->exentos_nd+=$data[$c]['exento'];}
             if($data[$c]['tipo']=='FAC'&&trim($data[$c]['condi'])==0){$this->exentos_fac_contado+=$data[$c]['exento'];}
@@ -561,6 +561,7 @@ function tabla_libro_ventas($data,$mes,$year){
                                $this->Cell($w[13],3,"",'LR',0,'R',$fill);//BASE
                  
                         }else{
+
                                 $this->Cell($w[13],3,number_format($base_temp,2,',','.'),'LR',0,'R',$fill);//BASE
                         }
                     }
@@ -645,10 +646,10 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
     $TOTAL_IVA=$IVA_ventas_contado+$IVA_ventas_credito+$IVA_notas_debito+$IVA_notas_credito;
     $TOTAL_BASES=$ventas_credito+$ventas_contado+$notas_debito+$notas_credito;
     $contenido=array(
-                        array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),number_format($this->exentos_fac_credito,2,',','.'),number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
-                        array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),number_format($this->exentos_fac_contado,2,',','.'),number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
-                        array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
-                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
+                        array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito-$this->exentos_fac_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),number_format($this->exentos_fac_credito,2,',','.'),number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
+                        array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado-$this->exentos_fac_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),number_format($this->exentos_fac_contado,2,',','.'),number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
+                        array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito-$this->exentos_nd,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
+                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito-$this->exentos_nc,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
                         array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),number_format($this->exentos,2,',','.'),number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
                         array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
