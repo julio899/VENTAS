@@ -179,23 +179,8 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
 	
 		$header=array('FECHA DOC','NRO. DOC.','NRO. CONTROL','MODO PAGO','N. CREDITO','N. DEBITO','DOC. REF','RIF','RAZON'); 
 		$datos=null;
-    	//foreach ($fac_ventas as $key => $value) {
-    		/*
-    		$tiene_retencion_en_mes=$this->data_complemento->tiene_retencion_en_mes_dideco($value['numdoc'],$mes,$year);
-    		if($tiene_retencion_en_mes){
-    			//var_dump($tiene_retencion_en_mes); exit();
-    			$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'],'control_comprobante'=>$tiene_retencion_en_mes[0]['control'],'fecemi_comprobante'=>$tiene_retencion_en_mes[0]['fecemi'],'monto_retenido'=>$tiene_retencion_en_mes[0]['monto']);
-    		}else{
-    				$datos[]=array($value['fecemi'],$value['numdoc'],$value['control'],'','','','',strtoupper($cliente['rif']),strtoupper( trim($cliente['razsoc']) ), $value['monto']+$value['moniva'] ,$value['bsexento'],trim($value['monto']-$value['bsexento'] ) ,$value['iva'],$value['moniva'] );		
-    		}
-    		*/
-    	
-    	//}
 
-    	/*Recorrido de NOTAS DE CREDITO*/
-    	/*FIN de NOTAS DE CREDITO*/
-    #$pdf->tabla_libro_ventas($notas_credito,$mes,$year);
-    	//var_dump($notas_debito_hische[3]);  exit();
+    	
     	$todos_datos=array_merge(
     								(array)$notas_credito,
     								(array)$notas_debito,
@@ -207,31 +192,104 @@ public function imp_fac_ventas_dideco($mes="",$year=""){
     								(array)$ret_imp_srl,
     								(array)$impuesto_municipal
     							 );
-    	//var_dump($fac_ventas); exit();
+    	
     	//$orden=$pdf->array_orderby($todos_datos, "numdoc",SORT_ASC);
     	$orden=$pdf->array_orderby($todos_datos, "orden_fecha",SORT_ASC);
     	//$pdf->tabla_libro_ventas($todos_datos,$mes,$year);
     	$union=array_merge((array)$orden,(array)$FACTURAS);
 	    $pdf->tabla_libro_ventas($union,$mes,$year);
-	    # TRABAJANDO AUN EN FUNCION $this->data_complemento->get_ret_fuera_mes_dideco($mes,$year);
-	    	/*if(count($notas_debito)>0 && $notas_debito!=NULL){
-	    		$pdf->tabla_libro_ventas($notas_debito,$mes,$year);
-		   	}
-		   	if(count($notas_debito_hische)>0){
-		   		$pdf->tabla_libro_ventas($notas_debito_hische,$mes,$year);
-		   	}*/
-    	//$pdf->Tabla_fac_ventas($header, $datos,$mes,$year);
-    	
-	
-		
+	    
+		$pdf->AliasNbPages();
+		$pdf->Output();
 
 
+
+}//imp_fac_ventas_dideco
+
+
+public function imp_fac_ventas($cod_emp="",$mes="",$year=""){
+	$this->load->helper('pdf');
+	$this->load->model('data_complemento');
+	$pdf = new PDF('L','mm','Legal');
+	$fin=FALSE;
+	switch ($cod_emp) {
+	 	case '001':
+	 		$empresa=array(
+	 						'razon'	=> 'Mayorista de Confites y Viveres ( DIDECO, C.A. )',
+	 						'rif'	=> 'J-07516808-9',
+	 						'compa'	=> 'dideco',
+	 						'cod'	=>	'001'
+	 						);
+	 		break;
+	 	
+	 	case '005':
+	 		$empresa=array(
+	 						'razon'	=> '( COMPACTO, C.A. )',
+	 						'rif'	=> 'J-30072142-6',
+	 						'compa'	=> 'compacto',
+	 						'cod'	=>	'005'
+	 						);
+	 		break;
+
+	 	case '002':
+	 		$empresa=array(
+	 						'razon'	=> '( DEIMPORT, C.A. )',
+	 						'rif'	=> 'J-30076979-8',
+	 						'compa'	=> 'deimport',
+	 						'cod'	=>	'002'
+	 						);
+	 		break;
+
+	 	default:
+	 		echo "<pre>debe especificar codigo de empresa</pre>";
+	 		$fin=TRUE;
+	 		break;
+	 }
+	 if ($fin) { exit(); }
+	 
+	 $fac_ventas=$this->data_complemento->get_fac_ventas($empresa,$mes,$year);	
+	 $fac_ventas_02_cpc=$this->data_complemento->get_fac_ventas_02_cpc($mes,$year,$empresa);
+	 $notas_credito=$this->data_complemento->get_nota_credito($mes,$year,$empresa);
+	 $notas_debito=$this->data_complemento->get_nota_debito_dideco($mes,$year,$empresa);
+	 $notas_debito_hische=$this->data_complemento->get_nota_debito_hische($mes,$year,$empresa);
+	 $ret_fuera_de_mes=$this->data_complemento->get_ret_fuera_mes($mes,$year,$empresa);
+	 $ret_imp_srl=$this->data_complemento->get_ret_imp_slr2($mes,$year,$empresa);
+	 $impuesto_municipal=$this->data_complemento->get_ret_imp_muni2($mes,$year,$empresa);
+
+	$pdf->SetMargins(5,5,5);   
+	$pdf->AliasNbPages(); 
+	$pdf->AddPage();
+	/*
+		* Ordenamiento de datos
+	*/
+
+    	$FACTURAS=array_merge(
+    								(array)$fac_ventas,
+    								(array)$fac_ventas_02_cpc
+    						  );
+    	$FACTURAS=$pdf->array_orderby($FACTURAS, "numdoc",SORT_ASC);
+
+    	$todos_datos=array_merge(
+    								(array)$notas_credito,
+    								(array)$notas_debito,
+    								(array)$notas_debito_hische,
+    								(array)$ret_fuera_de_mes,
+    								(array)$ret_imp_srl,
+    								(array)$impuesto_municipal
+    							 );
+
+    	$orden=$pdf->array_orderby($todos_datos, "orden_fecha",SORT_ASC);
+    	$union=array_merge((array)$orden,(array)$FACTURAS);
+
+	    $pdf->tabla_libro_ventas2($union,$mes,$year,$empresa);
+	    
 		$pdf->AliasNbPages();
 		$pdf->Output();
 
 
 
 }//imp_fac_ventas
+
 
 public function imp_talonario_pedidos($compa=''){
 	 $this->load->helper('pdf');
@@ -258,17 +316,17 @@ public function imp_talonario_pedidos($compa=''){
 		
 		$datosTabla=null;
 		$datosTabla=$this->procesos_productos($proveedores,$datosTabla,$compa);
-for ($p=0; $p < 10; $p++) { 
-	# 15 espacios
-	$datosTabla[]=array('','',"",'');
-}
-		
+		for ($p=0; $p < 10; $p++) { 
+			# 15 espacios
+			$datosTabla[]=array('','',"",'');
+		}
+			
 		$datosTabla[]=array('---','---',"-------- [ D E I M P O R T ] -------",'---');
 		$datosTabla=$this->procesos_productos($proveedores002,$datosTabla,'002');
-for ($p=0; $p < 13; $p++) { 
-	# 15 espacios
-	$datosTabla[]=array('','',"",'');
-}
+		for ($p=0; $p < 13; $p++) { 
+			# 15 espacios
+			$datosTabla[]=array('','',"",'');
+		}
 
 
 
@@ -300,131 +358,129 @@ for ($p=0; $p < 13; $p++) {
 		$pdf->TableFantacy($cabecera, $datosTabla);
 		$pdf->AliasNbPages();
 		$pdf->Output();
-
-
 }
 
 public function imprimir_pedidos(){
-$this->load->helper('pdf');
-$this->load->model('data_complemento');
-		$pdf = new PDF('P','mm','Legal');
-		$pdf->AliasNbPages();
-		#Establecemos los márgenes izquierda, arriba y derecha:
-		$pdf->SetMargins(5,5,5);
-		#Establecemos el margen inferior:
-		$pdf->SetAutoPageBreak(true,5);  
-		$pdf->AddPage();
-		$pdf->SetFont('Courier','B',16);
+	$this->load->helper('pdf');
+	$this->load->model('data_complemento');
+			$pdf = new PDF('P','mm','Legal');
+			$pdf->AliasNbPages();
+			#Establecemos los márgenes izquierda, arriba y derecha:
+			$pdf->SetMargins(5,5,5);
+			#Establecemos el margen inferior:
+			$pdf->SetAutoPageBreak(true,5);  
+			$pdf->AddPage();
+			$pdf->SetFont('Courier','B',16);
 
-		$pedidos=$this->data_complemento->todos_pedidos_A();
-		for ($i=0; $i < count($pedidos); $i++) { 
+			$pedidos=$this->data_complemento->todos_pedidos_A();
+			for ($i=0; $i < count($pedidos); $i++) { 
 
-				$pdf->SetX(5);
-				$tipo="";
+					$pdf->SetX(5);
+					$tipo="";
 
-				if($pedidos[$i]['tipo']==1){$tipo="C.O.D.";}else{$tipo="CR-10";}
-				$pdf->Ln();
-				$pdf->SetFont('Courier','B',16);
-				$pdf->Cell(1,8,utf8_decode("pedido id:".$pedidos[$i]['id']." Zona:".$pedidos[$i]['zona']."     CODIGO Cliente:[ ".$pedidos[$i]['codcte']." ] ".strtoupper($this->data_complemento->get_compaTXT($pedidos[$i]['compa'])) ));
-				$pdf->Ln();
-				$pdf->SetX(5);
-				$pdf->Cell(1,8,utf8_decode("[ CONDICION: ")); 
-				$pdf->SetTextColor(220,50,50);
-				$pdf->SetX(50);  
-				$pdf->Cell(1,8,utf8_decode($tipo));
-				$pdf->SetX(72);  
-				$pdf->SetTextColor(0,0,0);
-				$pdf->Cell(1,8,"]");
-				//VENDEDOR
-				$pdf->SetX(107);
-				$pdf->SetTextColor(200,100,0);
-				$pdf->Cell(1,6,utf8_decode("VENDEDOR: ".$pedidos[$i]['nombre_completo']));
-
-				$cliente=$this->data_complemento->get_cliente($pedidos[$i]['codcte'],$pedidos[$i]['compa']);
-				$pdf->Ln();
-				$pdf->SetX(5);
-				$pdf->SetTextColor(40,100,100);
-				$pdf->Cell(1,6,utf8_decode("[ ".$cliente['razsoc']." ]"));
-				
-
-				$pdf->SetTextColor(50,50,50);
-				
-				//Fecha		
-				if(strlen(($cliente['razsoc']))<36){
-									$pdf->SetX(137);
-									$pdf->Cell(1,8,utf8_decode(date_format(date_create($pedidos[$i]['fecha']),"d-m-Y H:i:s") ));  
-
-				}else{
+					if($pedidos[$i]['tipo']==1){$tipo="C.O.D.";}else{$tipo="CR-10";}
 					$pdf->Ln();
-					$pdf->SetX(137);
-					$pdf->Cell(1,8,utf8_decode(date_format(date_create($pedidos[$i]['fecha']),"d-m-Y H:i:s") ));  
+					$pdf->SetFont('Courier','B',16);
+					$pdf->Cell(1,8,utf8_decode("pedido id:".$pedidos[$i]['id']." Zona:".$pedidos[$i]['zona']."     CODIGO Cliente:[ ".$pedidos[$i]['codcte']." ] ".strtoupper($this->data_complemento->get_compaTXT($pedidos[$i]['compa'])) ));
+					$pdf->Ln();
+					$pdf->SetX(5);
+					$pdf->Cell(1,8,utf8_decode("[ CONDICION: ")); 
+					$pdf->SetTextColor(220,50,50);
+					$pdf->SetX(50);  
+					$pdf->Cell(1,8,utf8_decode($tipo));
+					$pdf->SetX(72);  
+					$pdf->SetTextColor(0,0,0);
+					$pdf->Cell(1,8,"]");
+					//VENDEDOR
+					$pdf->SetX(107);
+					$pdf->SetTextColor(200,100,0);
+					$pdf->Cell(1,6,utf8_decode("VENDEDOR: ".$pedidos[$i]['nombre_completo']));
 
-				}		
+					$cliente=$this->data_complemento->get_cliente($pedidos[$i]['codcte'],$pedidos[$i]['compa']);
+					$pdf->Ln();
+					$pdf->SetX(5);
+					$pdf->SetTextColor(40,100,100);
+					$pdf->Cell(1,6,utf8_decode("[ ".$cliente['razsoc']." ]"));
+					
 
-				$pdf->SetFont('Courier','I',16);
-				$pdf->Ln();
-				$obj=$this->data_complemento->productos_del_pedido($pedidos[$i]['id']);
-				
-				$pdf->SetX(10); 
-				$pdf->Ln(); 
-				$nro=0;
+					$pdf->SetTextColor(50,50,50);
+					
+					//Fecha		
+					if(strlen(($cliente['razsoc']))<36){
+										$pdf->SetX(137);
+										$pdf->Cell(1,8,utf8_decode(date_format(date_create($pedidos[$i]['fecha']),"d-m-Y H:i:s") ));  
 
-				$cantidad_prod=count($obj);
-				$pdf->Cell(1,8,"Nro.  CODIGO   CANT.        DESCRIPCION");
-				$pdf->Ln();
+					}else{
+						$pdf->Ln();
+						$pdf->SetX(137);
+						$pdf->Cell(1,8,utf8_decode(date_format(date_create($pedidos[$i]['fecha']),"d-m-Y H:i:s") ));  
 
-				 $pdf->SetFont('Courier','I',12);
-				//for que rrecorre los productos >>
+					}		
 
-				for ($e=0; $e <$cantidad_prod ; $e++) { 
+					$pdf->SetFont('Courier','I',16);
+					$pdf->Ln();
+					$obj=$this->data_complemento->productos_del_pedido($pedidos[$i]['id']);
+					
+					$pdf->SetX(10); 
+					$pdf->Ln(); 
+					$nro=0;
 
-						if($obj[$e]->idped==$pedidos[$i]['id']){
-							$nro++;
+					$cantidad_prod=count($obj);
+					$pdf->Cell(1,8,"Nro.  CODIGO   CANT.        DESCRIPCION");
+					$pdf->Ln();
+
+					 $pdf->SetFont('Courier','I',12);
+					//for que rrecorre los productos >>
+
+					for ($e=0; $e <$cantidad_prod ; $e++) { 
+
+							if($obj[$e]->idped==$pedidos[$i]['id']){
+								$nro++;
+								
+								$pdf->SetX(5);
+								if($nro<10){$nro=" ".$nro;}
+
+								$descr=$this->data_complemento->get_descripcion_producto($obj[$e]->cod_producto,$this->data_complemento->get_compaTXT($pedidos[$i]['compa']));
+								if($obj[$e]->cantidad<10){
+									$pdf->Cell(1,8,$nro.")      ".$obj[$e]->cod_producto."      [ ".$obj[$e]->cantidad."]       ".$descr);
+								}else{
+									$pdf->Cell(1,8,$nro.")      ".$obj[$e]->cod_producto."      [".$obj[$e]->cantidad."]       ".$descr);
+								
+								}
+								$pdf->Ln();
+
+							}	
+						}
+
+						if($pedidos[$i]['nota']!=""){
+						$pdf->Ln();
+					 	$pdf->SetFont('Courier','I',16);
+						$nota=utf8_decode("NOTA: ".$pedidos[$i]['nota']);
+						$pdf->MultiCell(200, 6,$nota);
+						$pdf->Ln();
+						}else{ $pdf->Ln(); }
+					$pdf->SetX(0);
+
+								$pdf->SetX(1);
+								$pdf->Cell(1,8,"PEDIDO: ".$pedidos[$i]['id']." - Cantidad de productos: ".$nro."");
+								$pdf->Ln();$pdf->SetX(1);
+					$pdf->Cell(1,6," - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
+					$pdf->Ln();
+					if($pdf->GetY()>250){ $pdf->AddPage();}
+			}
+					/*foreach ($pedidos as $key => $value) {
+						echo "key : $key  - value:".$value['id']." <-(ID) - Fecha: ".$value['fecha'];
+							$productos=$this->data_complemento->productos_del_pedido($value['id']);
+
+								echo "cantidad: ".count($productos);
+
+								//var_dump($productos);
 							
-							$pdf->SetX(5);
-							if($nro<10){$nro=" ".$nro;}
+						echo "<br><br>";
+					}*/
 
-							$descr=$this->data_complemento->get_descripcion_producto($obj[$e]->cod_producto,$this->data_complemento->get_compaTXT($pedidos[$i]['compa']));
-							if($obj[$e]->cantidad<10){
-								$pdf->Cell(1,8,$nro.")      ".$obj[$e]->cod_producto."      [ ".$obj[$e]->cantidad."]       ".$descr);
-							}else{
-								$pdf->Cell(1,8,$nro.")      ".$obj[$e]->cod_producto."      [".$obj[$e]->cantidad."]       ".$descr);
-							
-							}
-							$pdf->Ln();
-
-						}	
-					}
-
-					if($pedidos[$i]['nota']!=""){
-					$pdf->Ln();
-				 	$pdf->SetFont('Courier','I',16);
-					$nota=utf8_decode("NOTA: ".$pedidos[$i]['nota']);
-					$pdf->MultiCell(200, 6,$nota);
-					$pdf->Ln();
-					}else{ $pdf->Ln(); }
-				$pdf->SetX(0);
-
-							$pdf->SetX(1);
-							$pdf->Cell(1,8,"PEDIDO: ".$pedidos[$i]['id']." - Cantidad de productos: ".$nro."");
-							$pdf->Ln();$pdf->SetX(1);
-				$pdf->Cell(1,6," - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
-				$pdf->Ln();
-				if($pdf->GetY()>250){ $pdf->AddPage();}
-		}
-				/*foreach ($pedidos as $key => $value) {
-					echo "key : $key  - value:".$value['id']." <-(ID) - Fecha: ".$value['fecha'];
-						$productos=$this->data_complemento->productos_del_pedido($value['id']);
-
-							echo "cantidad: ".count($productos);
-
-							//var_dump($productos);
-						
-					echo "<br><br>";
-				}*/
-
-		$pdf->Footer();
-		$pdf->Output();
+			$pdf->Footer();
+			$pdf->Output();
 }
 
 public function imp_talonario_pedidos_DI_DE(){
@@ -478,7 +534,6 @@ public function imp_talonario_pedidos_DI_DE(){
 
 		$pdf->AliasNbPages();
 		$pdf->Output();
-
 }
 
 }
