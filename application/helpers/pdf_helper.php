@@ -9,6 +9,8 @@ public $exentos_nc=0;
 public $exentos_nd=0;
 public $exentos_fac_contado=0;
 public $exentos_fac_credito=0;
+public $ivas=null;
+public $detalle=null;
 
 // Load data
 function LoadData($file)
@@ -355,53 +357,47 @@ public function txt_mes($n_mes){
         return $txt;
 }//fin de txt_mes
 function membrete_Tabla_fac_ventas($w,$mes,$year){
-//$this->Cell(array_sum($w),0,'','T');
-        #Establecemos los márgenes izquierda, arriba y derecha:
-     
-   // $this->AddPage();
     $razon="Mayorista de Confites y Viveres ( DIDECO, C.A. ";
     $rif="J075168089";
     # MENBRETE
         #fuente
         $this->SetFont('Arial','IB',12);
-    $this->Cell(0,5,$razon.' - '.$rif.' )',0,0,'C');
+        $this->Cell(0,5,$razon.' - '.$rif.' )',0,0,'C');
         $this->SetFont('Arial','IB',9);
         $this->Ln();
-    $this->Cell(0,4,'Libro de Ventas',0,0,'C');
+        $this->Cell(0,4,'Libro de Ventas',0,0,'C');
         $this->Ln();
-    $this->Cell(0,4,$this->txt_mes($mes).' - 20'.$year,0,0,'C');
-       // $this->Ln();
-    //$this->Cell(0,3, ,0,0,'C');
-
+        $this->Cell(0,4,$this->txt_mes($mes).' - 20'.$year,0,0,'C');
         $this->SetFont('Arial','I',9);
-    $this->SetX(275);
-    $this->Write(2,'Emitido el '.date('d/m/Y h:i A').' * Pagina '.$this->PageNo().'/{nb}'); 
-    $this->SetX(0);    
-        $this->Ln(); 
-        $this->Ln();
-     # FIN de solo TEXTO   
 
-    // Colors, line width and bold font
-    $this->SetFillColor(50,50,50); // 255 0 0 >ROJO
-    $this->SetTextColor(255); // 255-> BLANCO
-    $this->SetDrawColor(0,0,0);//128,0,0->Rojo
-    $this->SetLineWidth(.2);//->grosor de linea Verticales
-    $this->SetFont('','B',7);
-    if($this->final!=TRUE){
-    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','FECHA DE','TIPO DE'); 
+        $this->SetX(275);
+        $this->Write(2,'Emitido el '.date('d/m/Y h:i A').' * Pagina '.$this->PageNo().'/{nb}'); 
+        $this->SetX(0);    
+            $this->Ln(); 
+            $this->Ln();
+         # FIN de solo TEXTO   
 
-    for($i=0;$i<count($header);$i++){
+            // Colors, line width and bold font
+            $this->SetFillColor(50,50,50); // 255 0 0 >ROJO
+            $this->SetTextColor(255); // 255-> BLANCO
+            $this->SetDrawColor(0,0,0);//128,0,0->Rojo
+            $this->SetLineWidth(.2);//->grosor de linea Verticales
+            $this->SetFont('','B',7);
+            if($this->final!=TRUE){
+                    $header=array('#', 'FECHA','NRO.','NRO','NOTA','NOTA','DOC.','FECHA','COMPROBANTE','RIF','RAZON SOCIAL','MONTO','EXENTO','BASE','%','MONTO','MONTO','FECHA DE','TIPO DE'); 
 
-     $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
-       }   
-    $this->Ln();
-    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','AFECT','RETENC.','DE RETENCION','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO','ANULACION','DOC.'); 
-    for($i=0;$i<count($header);$i++){
+                    for($i=0;$i<count($header);$i++){
+                            $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
+                       }   
+                        
+                        $this->Ln();
+                    $header=array('','DOC.','DOC.','CONTROL','CREDITO','DEBITO','AFECT','RETENC.','DE RETENCION','','','CON IVA','','IMPONIBLE','IVA','IVA','RETENIDO','ANULACION','DOC.'); 
+                for($i=0;$i<count($header);$i++){
 
-     $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
-       }   
-    $this->Ln();
-    }// fin de if($final) si es final que no imprima el encabzado de esta pagina
+                            $this->Cell($w[$i],3,$header[$i],0,0,'C',true);
+                   }   
+                    $this->Ln();
+            }// fin de if($final) si es final que no imprima el encabzado de esta pagina
 
     // Color and font restoration
     $this->SetFillColor(224,235,255);
@@ -748,12 +744,58 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
     $ventas_credito=0; $IVA_ventas_credito=0;
     $retenciones_islr=0;
     $this->exentos=0;
-
+    
     $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);  
         for($c=0 ; $c < count($data) ; $c++)
     {
         if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);  }
 
+
+               # Guardo los % de IVAS
+               # Preparacion del Resumen
+                if(isset($this->ivas[$data[$c]['%']])){
+
+                        #si es NC
+                        if($data[$c]['tipo']=='NC' && $data[$c]['st']!='A'){
+                            if(isset($this->detalle['NC'][$data[$c]['%']])){
+
+                                                $this->detalle['NC'][$data[$c]['%']]+=$data[$c]['iva'];
+                                     
+                                     if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
+                                                $this->detalle['NC']['base'.$data[$c]['%']]+=$data[$c]['base']-$data[$c]['exento'];
+                                        }else{
+                                                $this->detalle['NC']['base'.$data[$c]['%']]+=$data[$c]['base'];  
+                                        }
+                                  }else{
+                                         $this->detalle['NC'][$data[$c]['%']]=$data[$c]['iva']; 
+                                         #en caso de ser excento la base cambia
+                                        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
+                                                $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base']-$data[$c]['exento'];
+                                        }else{
+                                                $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base'];   
+                                        }
+                                      }
+                        }//cierre si es una NC
+                        # NC <<<<<<<<<<<<<<<<<<<<<<<
+                }else{
+                        $this->ivas[$data[$c]['%']]=$data[$c]['%'];
+                        #si es NC
+                        if($data[$c]['tipo']=='NC' && $data[$c]['st']!='A'){
+                            $this->detalle['NC'][$data[$c]['%']]=$data[$c]['iva'];
+                            #en caso de ser excento la base cambia
+                            if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
+                                    $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base']-$data[$c]['exento'];
+                            }else{
+                                    $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base'];   
+                            }
+                        }
+
+                }// CIERRE DE IF y ELSE de los IVAS
+
+
+                # - - - - - - - - - - - - - - - - #
+                # INICIO de CREACION de la TABLA  #
+                # - - - - - - - - - - - - - - - - #
         $this->Cell($w[0],3,$c+1,'LR',0,'C',$fill);
         # LA FECHA SE MUESTRA FECHSIT EN CASO DE RETENCION FUERA DE MES
           $this->Cell($w[1],3,$data[$c]['fecemi'],'LR',0,'C',$fill);
@@ -844,7 +886,15 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                     }
         #para los exentos
         if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
-            if($data[$c]['tipo']=='NC'){$this->exentos_nc+=$data[$c]['exento'];}
+            if($data[$c]['tipo']=='NC'){
+                $this->exentos_nc+=$data[$c]['exento'];
+                #acumulador para el detalle en caso de varios IVAS
+                if(isset($this->detalle['NC']['exento'.$data[$c]['%']])){
+                    $this->detalle['NC']['exento'.$data[$c]['%']]+=$data[$c]['exento'];
+                }else{
+                    $this->detalle['NC']['exento'.$data[$c]['%']]=$data[$c]['exento'];
+                }
+            }
             if($data[$c]['tipo']=='ND'){$this->exentos_nd+=$data[$c]['exento'];}
             if($data[$c]['tipo']=='FAC'&&trim($data[$c]['condi'])==0){$this->exentos_fac_contado+=$data[$c]['exento'];}
             if($data[$c]['tipo']=='FAC'&&trim($data[$c]['condi'])!=0){$this->exentos_fac_credito+=$data[$c]['exento'];}
@@ -853,6 +903,12 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
             //$this->Cell($w[12],3,$data[$c]['orden_fecha'],'LR',0,'R',$fill);//EXCENTO
         }else{
             $this->Cell($w[12],3,'','LR',0,'R',$fill);//EXCENTO
+             #acumulador para el detalle en caso de varios IVAS en caso que no haya exentos
+                if(isset($this->detalle['NC']['exento'.$data[$c]['%']])){
+                    $this->detalle['NC']['exento'.$data[$c]['%']]+=0;
+                }else{
+                    $this->detalle['NC']['exento'.$data[$c]['%']]=0;
+                }
         }
         
 
@@ -896,7 +952,9 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                                 }
                         }
                     }
-        $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
+                $this->Cell($w[14],3,$data[$c]['%'],'LR',0,'C',$fill);//% de IVA
+
+
             if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
                             if($data[$c]['iva']==0){
 
@@ -986,7 +1044,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
                         array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito-$this->exentos_fac_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),number_format($this->exentos_fac_credito,2,',','.'),number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
                         array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado-$this->exentos_fac_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),number_format($this->exentos_fac_contado,2,',','.'),number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
                         array('SUB-TOTAL NOTAS DE DEBITO  (12%)',number_format($notas_debito-$this->exentos_nd,2,',','.'),number_format($IVA_notas_debito,2,',','.'),'0.00',number_format($notas_debito+$IVA_notas_debito,2,',','.')),
-                        array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito-$this->exentos_nc,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
+                        //array('SUB-TOTAL NOTAS DE CREDITO (12%)',number_format($notas_credito-$this->exentos_nc,2,',','.'),number_format($IVA_notas_credito,2,',','.'),number_format($this->exentos_nc,2,',','.'),number_format($notas_credito+$IVA_notas_credito,2,',','.')),
                         array('- - - - - - - - - - - - - - - - - - - - - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - ','- - - - - - - - - '),
                         array('TOTAL GENERAL LIBRO MOVIMIENTOS EN VENTAS',number_format( $TOTAL_BASES-$this->exentos ,2,',','.'),number_format( $TOTAL_IVA,2,',','.'),number_format($this->exentos,2,',','.'),number_format($TOTAL_BASES+$TOTAL_IVA,2,',','.')),
                         array('TOTAL RETENCIONES IMPUESTO FISCAL...(75%)','','','',number_format( $retenciones,2,',','.')),
@@ -1036,6 +1094,28 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             $this->Cell($w[3],5,$contenido[2][3],'LR',0,'R',$fill);
             $this->Cell($w[4],5,$contenido[2][4],'LR',0,'R',$fill);
             $this->Ln();
+            
+            /*
+            $this->Cell($w[0],5,$contenido[3][0],'LR',0,'L',$fill);
+            $this->Cell($w[1],5,$contenido[3][1],'LR',0,'R',$fill);
+            $this->Cell($w[2],5,$contenido[3][2],'LR',0,'R',$fill);
+            $this->Cell($w[3],5,$contenido[3][3],'LR',0,'R',$fill);
+            $this->Cell($w[4],5,$contenido[3][4],'LR',0,'R',$fill);
+            $this->Ln();
+            */
+
+        foreach ($this->ivas as $key) {
+
+            //$this->Write(5,"IVA: ".$key. " NC base:".$this->detalle['NC']['base'.$key]. " IVA:".$this->detalle['NC'][$key]. " excento:".$this->detalle['NC']['exento'.$key]." TOTAL:".($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]) );     
+            
+            $this->Cell($w[0],5,'SUB-TOTAL NOTAS DE CREDITO ('.$key.'%)','LR',0,'L',$fill);
+            $this->Cell($w[1],5,number_format( $this->detalle['NC']['base'.$key],2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[2],5,number_format( $this->detalle['NC'][$key],2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[3],5,number_format( $this->detalle['NC']['exento'.$key],2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[4],5,number_format( ($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]),2,',','.'),'LR',0,'R',$fill);
+            $this->Ln();  
+        }
+
 
             $this->Cell($w[0],5,$contenido[3][0],'LR',0,'L',$fill);
             $this->Cell($w[1],5,$contenido[3][1],'LR',0,'R',$fill);
@@ -1058,27 +1138,38 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             $this->Cell($w[4],5,$contenido[5][4],'LR',0,'R',$fill);
             $this->Ln();
 
+            # si islr es 0 no se imprime
+            if(trim($contenido[6][4])!=0){
             $this->Cell($w[0],5,$contenido[6][0],'LR',0,'L',$fill);
             $this->Cell($w[1],5,$contenido[6][1],'LR',0,'R',$fill);
             $this->Cell($w[2],5,$contenido[6][2],'LR',0,'R',$fill);
             $this->Cell($w[3],5,$contenido[6][3],'LR',0,'R',$fill);
-            $this->Cell($w[4],5,$contenido[6][4],'LR',0,'R',$fill);
-            $this->Ln();
-
-            # si islr es 0 no se imprime
-            if(trim($contenido[7][4])!=0){
-
-            $this->Cell($w[0],5,$contenido[7][0],'LR',0,'L',$fill);
-            $this->Cell($w[1],5,$contenido[7][1],'LR',0,'R',$fill);
-            $this->Cell($w[2],5,$contenido[7][2],'LR',0,'R',$fill);
-            $this->Cell($w[3],5,$contenido[7][3],'LR',0,'R',$fill);
-            $this->Cell($w[4],5,number_format($contenido[7][4],2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[4],5,number_format($contenido[6][4],2,',','.'),'LR',0,'R',$fill);
             $this->Ln();   
             }
 
 
     $this->Cell(array_sum($w),0,'','T');
-    //$this->Ln();
+    $this->Ln();
+        /*
+        foreach ($this->ivas as $key) {
+
+            $this->Write(5,"IVA: ".$key. " NC base:".$this->detalle['NC']['base'.$key]. " IVA:".$this->detalle['NC'][$key]. " excento:".$this->detalle['NC']['exento'.$key]." TOTAL:".($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]) );     
+            $this->Ln();  
+        }*/
+
+
+      //  foreach ($this->detalle as $key => $value ) {
+            //key es NC o FAC  la posicion del tipo
+            //$this->Write(5,"detalle $key: ".$this->detalle[$key]);
+                /*foreach ($value as $porcentaje_IVA=>$x) {
+                 $this->Write(5,"%IVA: ".$x);$this->Ln(); 
+                }*/
+      //      foreach ($this->detalle[$key] as $llave => $o) {
+      //          $this->Write(5," detalle $key ".number_format( $o,2,',','.').": ".$llave);   $this->Ln();  
+      //      }
+      //   }
+
     //$this->Write(5,"EXENTOS: ".$this->exentos);
 
         
