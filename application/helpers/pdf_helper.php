@@ -1043,7 +1043,7 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
     $this->Write(5,'Monto en Retenciones.........: '.number_format($retenciones,2,',','.')); $this->Ln();
    */ 
 
-     if($this->GetY()>141){ $this->final=TRUE;
+     if($this->GetY()>140){ $this->final=TRUE;
                             $this->AddPage(); $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);
                             }
     $this->detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito );

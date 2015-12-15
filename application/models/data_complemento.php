@@ -325,7 +325,7 @@ function get_ret_fuera_mes($mes,$year,$empresa){
     $datos=null;
 
         foreach ($data as $key => $value) {
-            if("$mes/$year"!=substr(trim($this->get_doc_hiscpc($value['docref'],$value['tipref'])[0]['fecemi']),-5,5)){
+            if("$mes/$year"!=substr(trim($this->get_doc_hiscpc($value['docref'],$value['tipref'],$empresa)[0]['fecemi']),-5,5)){
                 
                 $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,$empresa['cod'] );
                 $razon=$cliente['razsoc'];
@@ -360,8 +360,9 @@ function get_ret_fuera_mes($mes,$year,$empresa){
 }
 
 
-function get_doc_hiscpc($numdoc,$tipdoc){
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '$tipdoc' AND `numdoc` LIKE '$numdoc' ORDER BY `hiscpc`.`numdoc`  ASC";
+function get_doc_hiscpc($numdoc,$tipdoc,$empresa){
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '$tipdoc' AND `numdoc` LIKE '$numdoc' ORDER BY `hiscpc`.`numdoc`  ASC";
+    //var_dump($sql); exit();
     $query=$this->db->query($sql);
     $data=$query->result_array();
         if(count($data)>0){
