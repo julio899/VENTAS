@@ -117,6 +117,40 @@ $db['compacto']['autoinit'] = TRUE;
 $db['compacto']['stricton'] = FALSE;
 
 
+$db['compacto_lara']['hostname'] = 'localhost';
+$db['compacto_lara']['username'] = 'root';
+$db['compacto_lara']['password'] = 'vinachi89';
+$db['compacto_lara']['database'] = 'grupoemp_sql_compacto_lara';
+$db['compacto_lara']['dbdriver'] = 'mysql';
+$db['compacto_lara']['dbprefix'] = '';
+$db['compacto_lara']['pconnect'] = TRUE;
+$db['compacto_lara']['db_debug'] = TRUE;
+$db['compacto_lara']['cache_on'] = FALSE;
+$db['compacto_lara']['cachedir'] = '';
+$db['compacto_lara']['char_set'] = 'utf8';
+$db['compacto_lara']['dbcollat'] = 'utf8_general_ci';
+$db['compacto_lara']['swap_pre'] = '';
+$db['compacto_lara']['autoinit'] = TRUE;
+$db['compacto_lara']['stricton'] = FALSE;
+
+
+$db['deimport_lara']['hostname'] = 'localhost';
+$db['deimport_lara']['username'] = 'root';
+$db['deimport_lara']['password'] = 'vinachi89';
+$db['deimport_lara']['database'] = 'grupoemp_sql_deimport_lara';
+$db['deimport_lara']['dbdriver'] = 'mysql';
+$db['deimport_lara']['dbprefix'] = '';
+$db['deimport_lara']['pconnect'] = TRUE;
+$db['deimport_lara']['db_debug'] = TRUE;
+$db['deimport_lara']['cache_on'] = FALSE;
+$db['deimport_lara']['cachedir'] = '';
+$db['deimport_lara']['char_set'] = 'utf8';
+$db['deimport_lara']['dbcollat'] = 'utf8_general_ci';
+$db['deimport_lara']['swap_pre'] = '';
+$db['deimport_lara']['autoinit'] = TRUE;
+$db['deimport_lara']['stricton'] = FALSE;
+
+
 
 /* End of file database.php */
 /* Location: ./application/config/database.php */

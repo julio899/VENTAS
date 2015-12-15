@@ -747,21 +747,30 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
     
     $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);  
         for($c=0 ; $c < count($data) ; $c++)
-    {
+    {                       $mA=100;
+
+                               if($data[$c]['st']=='A'){
+                                    $fecha_anulacion=$data[$c]['fecanul'];
+                                    $yA=substr($fecha_anulacion, 0,4);
+                                    $mA=substr($fecha_anulacion, 4,2);
+                                    $dA=substr($fecha_anulacion, -2,2);
+                                }
         if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);  }
 
 
                # Guardo los % de IVAS
                # Preparacion del Resumen
                 if(isset($this->ivas[$data[$c]['%']])){
-
+                    
                         #si es NC
-                        if($data[$c]['tipo']=='NC' && $data[$c]['st']!='A'){
+                               // var_dump($mA); exit();
+                        if($data[$c]['tipo']=='NC' && $mA>$mes ){
+
                             if(isset($this->detalle['NC'][$data[$c]['%']])){
 
                                                 $this->detalle['NC'][$data[$c]['%']]+=$data[$c]['iva'];
                                      
-                                     if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
+                                     if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
                                                 $this->detalle['NC']['base'.$data[$c]['%']]+=$data[$c]['base']-$data[$c]['exento'];
                                         }else{
                                                 $this->detalle['NC']['base'.$data[$c]['%']]+=$data[$c]['base'];  
@@ -769,7 +778,7 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                                   }else{
                                          $this->detalle['NC'][$data[$c]['%']]=$data[$c]['iva']; 
                                          #en caso de ser excento la base cambia
-                                        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
+                                        if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0' ){
                                                 $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base']-$data[$c]['exento'];
                                         }else{
                                                 $this->detalle['NC']['base'.$data[$c]['%']]=$data[$c]['base'];   
@@ -780,7 +789,7 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                 }else{
                         $this->ivas[$data[$c]['%']]=$data[$c]['%'];
                         #si es NC
-                        if($data[$c]['tipo']=='NC' && $data[$c]['st']!='A'){
+                        if($data[$c]['tipo']=='NC' && $mA>$mes ){
                             $this->detalle['NC'][$data[$c]['%']]=$data[$c]['iva'];
                             #en caso de ser excento la base cambia
                             if(isset($data[$c]['exento']) && trim($data[$c]['exento'])!='0'  && $data[$c]['st']!='A'){
@@ -1000,13 +1009,18 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                     }
 
             }
-        #en CASO de ANULACION
-            if($data[$c]['st']=='A'){
+        #en CASO de ANULACION && $mA>$mes
+            //if($data[$c]['st']=='A'){
+              if($data[$c]['st']=='A'){
                     $fecha=$data[$c]['fecanul'];
                     $y=substr($fecha, 0,4);
                     $m=substr($fecha, 4,2);
                     $d=substr($fecha, -2,2);
-                $this->Cell($w[17],3,$d.'/'.$m.'/'.$y,'LR',0,'C',$fill);
+                    if($m>$mes){
+                        $this->Cell($w[17],3,'','LR',0,'C',$fill);
+                    }else{
+                          $this->Cell($w[17],3,$d.'/'.$m.'/'.$y,'LR',0,'C',$fill);   
+                    }
             }else{
                 $this->Cell($w[17],3,'','LR',0,'C',$fill);
             }
@@ -1038,8 +1052,17 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
 
 function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_credito, $notas_debito, $retenciones,$retenciones_islr,$IVA_ventas_credito,$IVA_ventas_contado,$IVA_notas_credito,$IVA_notas_debito )
 {
+
+    $total_general_gravable=0;
+    $total_general_iva=0;
+    $total_general_exento=0;
+
     $TOTAL_IVA=$IVA_ventas_contado+$IVA_ventas_credito+$IVA_notas_debito+$IVA_notas_credito;
     $TOTAL_BASES=$ventas_credito+$ventas_contado+$notas_debito+$notas_credito;
+
+    $total_general_gravable=($ventas_credito-$this->exentos_fac_credito)+($ventas_contado-$this->exentos_fac_contado)+($notas_debito-$this->exentos_nd);
+    $total_general_iva=$IVA_ventas_credito+$IVA_ventas_contado+$IVA_notas_debito;
+    $total_general_exento=($this->exentos_fac_credito+$this->exentos_fac_contado);
     $contenido=array(
                         array('SUB-TOTAL VENTAS A CREDITO',number_format($ventas_credito-$this->exentos_fac_credito,2,',','.'),number_format($IVA_ventas_credito,2,',','.'),number_format($this->exentos_fac_credito,2,',','.'),number_format($ventas_credito+$IVA_ventas_credito,2,',','.')),
                         array('SUB-TOTAL VENTAS A CONTADO',number_format($ventas_contado-$this->exentos_fac_contado,2,',','.'),number_format($IVA_ventas_contado,2,',','.'),number_format($this->exentos_fac_contado,2,',','.'),number_format($ventas_contado+$IVA_ventas_contado,2,',','.')), 
@@ -1072,7 +1095,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
         #CIERRE DE CABECERA
         #INICIO de CONTENIDO
         $this->SetTextColor(0); // 255-> BLANCO
-        $fill=false;
+        $fill=false; 
             $this->Cell($w[0],5,$contenido[0][0],'LR',0,'L',$fill);
             $this->Cell($w[1],5,$contenido[0][1],'LR',0,'R',$fill);
             $this->Cell($w[2],5,$contenido[0][2],'LR',0,'R',$fill);
@@ -1106,8 +1129,11 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
 
         foreach ($this->ivas as $key) {
 
+            $total_general_gravable+=$this->detalle['NC']['base'.$key];
+            $total_general_iva+=$this->detalle['NC'][$key];
+            $total_general_exento+=$this->detalle['NC']['exento'.$key];
             //$this->Write(5,"IVA: ".$key. " NC base:".$this->detalle['NC']['base'.$key]. " IVA:".$this->detalle['NC'][$key]. " excento:".$this->detalle['NC']['exento'.$key]." TOTAL:".($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]) );     
-            
+          
             $this->Cell($w[0],5,'SUB-TOTAL NOTAS DE CREDITO ('.$key.'%)','LR',0,'L',$fill);
             $this->Cell($w[1],5,number_format( $this->detalle['NC']['base'.$key],2,',','.'),'LR',0,'R',$fill);
             $this->Cell($w[2],5,number_format( $this->detalle['NC'][$key],2,',','.'),'LR',0,'R',$fill);
@@ -1125,10 +1151,10 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             $this->Ln();
 
             $this->Cell($w[0],5,$contenido[4][0],'LR',0,'L',$fill);
-            $this->Cell($w[1],5,$contenido[4][1],'LR',0,'R',$fill);
-            $this->Cell($w[2],5,$contenido[4][2],'LR',0,'R',$fill);
-            $this->Cell($w[3],5,$contenido[4][3],'LR',0,'R',$fill);
-            $this->Cell($w[4],5,$contenido[4][4],'LR',0,'R',$fill);
+            $this->Cell($w[1],5,number_format($total_general_gravable,2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[2],5,number_format($total_general_iva,2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[3],5,number_format($total_general_exento,2,',','.'),'LR',0,'R',$fill);
+            $this->Cell($w[4],5,number_format(($total_general_gravable+$total_general_iva),2,',','.'),'LR',0,'R',$fill);
             $this->Ln();
 
             $this->Cell($w[0],5,$contenido[5][0],'LR',0,'L',$fill);

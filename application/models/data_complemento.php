@@ -12,9 +12,9 @@ public $data;
 */
 
 function get_fac_ventas($empresa,$mes,$year){
-
+    //var_dump($this->load->database($empresa['compa'],TRUE)); exit();
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
     $query=$this->db->query($sql);
     $data=$query->result_array();
     $datos=null;
@@ -73,7 +73,7 @@ function get_fac_ventas($empresa,$mes,$year){
 
 function get_fac_ventas_02_cpc($mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT * FROM `02_cpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`02_cpc` WHERE `tipdoc` LIKE '1' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `numdoc` ASC";
     //var_dump($sql); exit();
     $query=$this->db->query($sql);
     $data=$query->result_array();
@@ -129,7 +129,8 @@ function get_fac_ventas_02_cpc($mes,$year,$empresa){
 
 function get_nota_credito($mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '7' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '7' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
+    
     $query=$this->db->query($sql);
     $this->data=$query->result_array();
     $datos=null;
@@ -137,8 +138,9 @@ function get_nota_credito($mes,$year,$empresa){
         $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,$empresa['cod']  );
         $razon=$cliente['razsoc'];
         $rif=$cliente['rif'];
-        $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '8' AND `fecemi` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
+        $sql2="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '8' AND `fecemi` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
         $query2=$this->db->query($sql2);
+        
         $sql_temp_iva=$query2->result_array();
                 $arreglo_fecha=explode('/',$value['fecemi']);
                 $orden_fecha=$arreglo_fecha[2].$arreglo_fecha[1].$arreglo_fecha[0];
@@ -150,6 +152,7 @@ function get_nota_credito($mes,$year,$empresa){
                 $monto_iva=trim($sql_temp_iva[0]['monto']);
             }
             $monto_base=trim($value['monto']);
+            //var_dump($sql_temp_iva); exit();
             if($sql_temp_iva[0]['iva']>9){
                 $iva_de="0.".$sql_temp_iva[0]['iva'];
                 
@@ -201,7 +204,7 @@ function get_nota_credito($mes,$year,$empresa){
 
 function get_nota_debito($mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '4' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '4' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc`  ASC";
     
     $query=$this->db->query($sql);
     $this->data=$query->result_array();
@@ -210,7 +213,7 @@ function get_nota_debito($mes,$year,$empresa){
         $cliente=$this->get_cliente( substr($value['codcte'], -4,4) ,$empresa['cod'] );
         $razon=$cliente['razsoc'];
         $rif=$cliente['rif'];
-        $sql2="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
+        $sql2="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' AND `numdoc` LIKE '".$value['numdoc']."' ORDER BY `hiscpc`.`fecemi`  ASC LIMIT 1";
         $query2=$this->db->query($sql2);
         $sql_temp_iva=$query2->result_array();
                 $arreglo_fecha=explode('/',$value['fecemi']);
@@ -240,7 +243,7 @@ function get_nota_debito($mes,$year,$empresa){
 # * * #
 function get_nota_debito_hische($mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT * FROM `hische` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hische`.`numdoc` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hische` WHERE `tipdoc` LIKE '3' AND `fecanc` LIKE '%/$mes/$year' ORDER BY `hische`.`numdoc` ASC";
     $query=$this->db->query($sql);
     $this->data=$query->result_array();
     $datos=null;
@@ -281,7 +284,7 @@ function get_nota_debito_hische($mes,$year,$empresa){
 
 function tiene_retencion($numdoc,$mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT *  FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $sql="SELECT *  FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
     $query=$this->db->query($sql);
     $respuesta=FALSE;
     $datos=$query->result_array();
@@ -292,7 +295,7 @@ function tiene_retencion($numdoc,$mes,$year,$empresa){
 
 function tiene_retencion_hische($numdoc,$mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT *  FROM `hische` WHERE `tipdoc` LIKE '*' AND `fecanc` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $sql="SELECT *  FROM `grupoemp_sql_".$empresa['compa']."`.`hische` WHERE `tipdoc` LIKE '*' AND `fecanc` LIKE '%/$mes/$year' AND `docref` LIKE '$numdoc' LIMIT 1";
     $query=$this->db->query($sql);
     $respuesta=FALSE;
     $datos=$query->result_array();
@@ -303,7 +306,7 @@ function tiene_retencion_hische($numdoc,$mes,$year,$empresa){
 
 function tiene_retencion_hische_nd($numdoc,$empresa){
     $this->load->database($empresa['compa'],TRUE);
-    $sql="SELECT *  FROM `hische` WHERE `tipdoc` LIKE '*' AND `docref` LIKE '$numdoc' LIMIT 1";
+    $sql="SELECT *  FROM `grupoemp_sql_".$empresa['compa']."`.`hische` WHERE `tipdoc` LIKE '*' AND `docref` LIKE '$numdoc' LIMIT 1";
     $query=$this->db->query($sql);
     $respuesta=FALSE;
     $datos=$query->result_array();
@@ -316,7 +319,7 @@ function tiene_retencion_hische_nd($numdoc,$empresa){
 function get_ret_fuera_mes($mes,$year,$empresa){
     $this->load->database($empresa['compa'],TRUE);
     
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`fechsit` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '*' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`fechsit` ASC";
     $query=$this->db->query($sql);
     $data=$query->result_array();
     $datos=null;
@@ -370,7 +373,7 @@ function get_doc_hiscpc($numdoc,$tipdoc){
 
 
 function get_ret_imp_slr2($mes,$year,$empresa){
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE '.' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE '.' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc` ASC";
     $query=$this->db->query($sql);
     $data=$query->result_array();
     $datos=null;
@@ -412,7 +415,7 @@ function get_ret_imp_slr2($mes,$year,$empresa){
 
 
 function get_ret_imp_muni2($mes,$year,$empresa){
-    $sql="SELECT * FROM `hiscpc` WHERE `tipdoc` LIKE ',' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc` ASC";
+    $sql="SELECT * FROM `grupoemp_sql_".$empresa['compa']."`.`hiscpc` WHERE `tipdoc` LIKE ',' AND `fecemi` LIKE '%/$mes/$year' ORDER BY `hiscpc`.`numdoc` ASC";
     $query=$this->db->query($sql);
     $data=$query->result_array();
     $datos=null;
@@ -1212,15 +1215,21 @@ switch ($codCompa) {
 			case '002':
 				$compaTXT='deimport';
 				break;
-			case '005':
-				$compaTXT='compacto';
-				break;
+            case '005':
+                $compaTXT='compacto';
+                break;
+            case '004':
+                $compaTXT='compacto_lara';
+                break;
+            case '008':
+                $compaTXT='deimport_lara';
+                break;
 			}
 	
 	$this->load->database($compaTXT,TRUE);
-
-	$this->query = $this->db->query("SELECT * FROM  `01_cpc` WHERE  `codcte` LIKE '$codCte' LIMIT 1");
-
+    $sql="SELECT * FROM  `grupoemp_sql_".$compaTXT."`.`01_cpc` WHERE  `codcte` LIKE '$codCte' LIMIT 1";
+    //    var_dump($sql); exit();
+	$this->query = $this->db->query($sql);
 
 				foreach ($this->query->result() as $row)
 						{
@@ -1247,6 +1256,12 @@ public function get_compaTXT($codCompa){
                         break;
                     case '005':
                         $compaTXT='compacto';
+                        break;
+                    case '004':
+                        $compaTXT='compacto_lara';
+                        break;
+                    case '008':
+                        $compaTXT='deimport_lara';
                         break;
                     
             }

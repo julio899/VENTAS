@@ -240,6 +240,25 @@ public function imp_fac_ventas($cod_emp="",$mes="",$year=""){
 	 						);
 	 		break;
 
+	 	
+	 	case '004':
+	 		$empresa=array(
+	 						'razon'	=> '( COMPACTO, C.A. SUCURSAL LARA)',
+	 						'rif'	=> 'J-30072142-6',
+	 						'compa'	=> 'compacto_lara',
+	 						'cod'	=>	'004'
+	 						);
+	 		break;
+
+	 	case '008':
+	 		$empresa=array(
+	 						'razon'	=> '( DEIMPORT, C.A. SUCURSAL LARA)',
+	 						'rif'	=> 'J-30076979-8',
+	 						'compa'	=> 'deimport_lara',
+	 						'cod'	=>	'008'
+	 						);
+	 		break;
+
 	 	default:
 	 		echo "<pre>debe especificar codigo de empresa</pre>";
 	 		$fin=TRUE;
