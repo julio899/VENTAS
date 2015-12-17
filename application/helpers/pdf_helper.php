@@ -757,9 +757,10 @@ function tabla_libro_ventas2($data,$mes,$year,$empresa){
                                 }
         if($this->GetY()==192){   $this->Cell(array_sum($w),0,'','T');  $this->AddPage(); $this->membrete_Tabla_fac_ventas2($w,$mes,$year,$empresa);  }
 
-
+                //var_dump($data[$c]['%']); exit();
                # Guardo los % de IVAS
                # Preparacion del Resumen
+                //var_dump($data[$c]['%']); exit();
                 if(isset($this->ivas[$data[$c]['%']])){
                     
                         #si es NC
@@ -1128,18 +1129,22 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             */
 
         foreach ($this->ivas as $key) {
+//            var_dump($this->detalle['NC']); exit();
+            if(isset($this->detalle['NC']['base'.$key])){
 
-            $total_general_gravable+=$this->detalle['NC']['base'.$key];
-            $total_general_iva+=$this->detalle['NC'][$key];
-            $total_general_exento+=$this->detalle['NC']['exento'.$key];
+                $total_general_gravable+=$this->detalle['NC']['base'.$key];
+                $total_general_iva+=$this->detalle['NC'][$key];
+                $total_general_exento+=$this->detalle['NC']['exento'.$key];
+                
+                $this->Cell($w[0],5,'SUB-TOTAL NOTAS DE CREDITO ('.$key.'%)','LR',0,'L',$fill);
+                $this->Cell($w[1],5,number_format( $this->detalle['NC']['base'.$key],2,',','.'),'LR',0,'R',$fill);
+                $this->Cell($w[2],5,number_format( $this->detalle['NC'][$key],2,',','.'),'LR',0,'R',$fill);
+                $this->Cell($w[3],5,number_format( $this->detalle['NC']['exento'.$key],2,',','.'),'LR',0,'R',$fill);
+                $this->Cell($w[4],5,number_format( ($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]+$this->detalle['NC']['exento'.$key]),2,',','.'),'LR',0,'R',$fill);
+                $this->Ln();       
+            }
             //$this->Write(5,"IVA: ".$key. " NC base:".$this->detalle['NC']['base'.$key]. " IVA:".$this->detalle['NC'][$key]. " excento:".$this->detalle['NC']['exento'.$key]." TOTAL:".($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]) );     
-          
-            $this->Cell($w[0],5,'SUB-TOTAL NOTAS DE CREDITO ('.$key.'%)','LR',0,'L',$fill);
-            $this->Cell($w[1],5,number_format( $this->detalle['NC']['base'.$key],2,',','.'),'LR',0,'R',$fill);
-            $this->Cell($w[2],5,number_format( $this->detalle['NC'][$key],2,',','.'),'LR',0,'R',$fill);
-            $this->Cell($w[3],5,number_format( $this->detalle['NC']['exento'.$key],2,',','.'),'LR',0,'R',$fill);
-            $this->Cell($w[4],5,number_format( ($this->detalle['NC'][$key]+$this->detalle['NC']['base'.$key]-$this->detalle['NC']['exento'.$key]),2,',','.'),'LR',0,'R',$fill);
-            $this->Ln();  
+           
         }
 
 

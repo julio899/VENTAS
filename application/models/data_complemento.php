@@ -152,14 +152,24 @@ function get_nota_credito($mes,$year,$empresa){
                 $monto_iva=trim($sql_temp_iva[0]['monto']);
             }
             $monto_base=trim($value['monto']);
-            //var_dump($sql_temp_iva); exit();
-            if($sql_temp_iva[0]['iva']>9){
-                $iva_de="0.".$sql_temp_iva[0]['iva'];
-                
+            if(!isset($sql_temp_iva[0]['iva'])){ 
+                #en caso que no consiga tipdoc 8 sera exento
+                //var_dump($sql2);
+                //exit();
+                $monto_iva=0;
+                $iva_de=0;
             }else{
-                $iva_de="0.0".$sql_temp_iva[0]['iva'];
+                    
+                    if($sql_temp_iva[0]['iva']>9){
+                        $iva_de="0.".$sql_temp_iva[0]['iva'];
+                        
+                    }else{
+                        $iva_de="0.0".$sql_temp_iva[0]['iva'];
+                    }
+
             }
             #RESP $rsult_o1=str_replace('-', '', ($monto_iva)/0.12 );
+            if($iva_de==0 ){$iva_de='0.12'; }
             $rsult_o1=str_replace('-', '', ($monto_iva)/$iva_de );
             $rsult_o1=explode('.', $rsult_o1);
             $rsult_o2=str_replace('-', '', $monto_base );
