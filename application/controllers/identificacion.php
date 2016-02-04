@@ -69,6 +69,10 @@ class Identificacion extends CI_Controller {
 				# En Caso de Ser Vendedor
 				redirect('ventas');
 				break;
+			case 'L':
+				# En Caso de Ser Libros de Ventas
+				redirect('librosventas');
+				break;
 			case 'F':
 				# En Caso de Ser Facturador
 				redirect('facturacion');

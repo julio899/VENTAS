@@ -1127,7 +1127,7 @@ function detalle_libro_ventas_dideco($ventas_credito, $ventas_contado, $notas_cr
             $this->Cell($w[4],5,$contenido[3][4],'LR',0,'R',$fill);
             $this->Ln();
             */
-
+//var_dump($this->ivas); exit();
         foreach ($this->ivas as $key) {
 //            var_dump($this->detalle['NC']); exit();
             if(isset($this->detalle['NC']['base'.$key])){
