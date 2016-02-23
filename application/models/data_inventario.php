@@ -95,6 +95,7 @@ ORDER BY 01inv.existen DESC";
                             "existen"=>$row->existen
                             );
                 }/*fin de foreach*/
+                var_dump($sql); exit();
 return $data;
 
 }//fin de la funcion get_productos_act_existencia
