@@ -335,14 +335,14 @@ public function imp_talonario_pedidos($compa=''){
 		
 		$datosTabla=null;
 		$datosTabla=$this->procesos_productos($proveedores,$datosTabla,$compa);
-		for ($p=0; $p < 10; $p++) { 
+		for ($p=0; $p < 5; $p++) { 
 			# 15 espacios
 			$datosTabla[]=array('','',"",'');
 		}
 			
 		$datosTabla[]=array('---','---',"-------- [ D E I M P O R T ] -------",'---');
 		$datosTabla=$this->procesos_productos($proveedores002,$datosTabla,'002');
-		for ($p=0; $p < 13; $p++) { 
+		for ($p=0; $p < 5; $p++) { 
 			# 15 espacios
 			$datosTabla[]=array('','',"",'');
 		}
