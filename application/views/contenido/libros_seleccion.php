@@ -10,6 +10,10 @@
     
     <div class="row">
       <div class="col s12">
+      <br><br><br>
+      <pre>Ingrese mes, año y seleccione la empresa y luego de clip al boton generar</pre><br>
+      </div>
+      <div class="col s12">
 
           <form action="<?php echo base_url().index_page();?>/librosventas/generar_libro" method="post">
               <div class="row">
@@ -21,7 +25,9 @@
                       <option value="" disabled="" selected="">Seleccione Empresa</option>
                       <option value="001">Dideco</option>
                       <option value="002">Deimport</option>
+                      <option value="008">Deimport Lara</option>
                       <option value="005">Compacto</option>
+                      <option value="004">Compacto Lara</option>
                     </select>
                   </div>
                 </div>
