@@ -18,11 +18,11 @@ public function get_compaTXT($codCompa=''){
 			$compaTXT="default";
 			break;
 	}
-return $compaTXT;
+    return $compaTXT;
 }
 
 function get_proveedores($CodCompa=''){
-$data=NULL;
+    $data=NULL;
  $this->load->database($this->get_compaTXT($CodCompa),TRUE);
     $query=$this->db->query("SELECT * FROM  `01_cpp` WHERE `ina` LIKE 'A'");
     //$query=$this->db->query("SELECT * FROM  `01_cpp`");
@@ -68,11 +68,11 @@ public function get_20productos_compa($codCompa='',$aBuscar='',$data=''){
 
 //obtener los productos activos de una compañia ordenados por existencia
 public function get_productos_act_existencia($CodCompa=""){
-    $sql="SELECT 01_inv.codcia, 01_inv.clave,01_inv.clavprov, 01_inv.descr, 01inv.costo, 01inv.ventas, 01inv.ventaz, 01inv.ventam, 01inv.ventad, 01inv.ventae, 01_inv.ofers, 01_inv.ofere, 01_inv.oferd, 01_inv.oferm, 01_inv.oferz, 01inv.existen
-FROM `01_inv` , `01inv`
-WHERE 01_inv.st LIKE 'A'
-AND 01_inv.clave LIKE 01inv.clave
-ORDER BY 01inv.existen DESC";
+    $sql="  SELECT 01_inv.codcia, 01_inv.clave,01_inv.clavprov, 01_inv.descr, 01inv.costo, 01inv.ventas, 01inv.ventaz, 01inv.ventam, 01inv.ventad, 01inv.ventae, 01_inv.ofers, 01_inv.ofere, 01_inv.oferd, 01_inv.oferm, 01_inv.oferz, 01inv.existen
+            FROM `01_inv` , `01inv`
+            WHERE 01_inv.st LIKE 'A'
+            AND 01_inv.clave LIKE 01inv.clave
+            ORDER BY 01inv.existen DESC";
     $this->load->database($this->get_compaTXT($CodCompa),TRUE);
     $query=$this->db->query($sql);
     $data=array();
@@ -95,19 +95,19 @@ ORDER BY 01inv.existen DESC";
                             "existen"=>$row->existen
                             );
                 }/*fin de foreach*/
-                var_dump($sql); exit();
-return $data;
-
+                //var_dump($sql); exit();
+    
+    return $data;
 }//fin de la funcion get_productos_act_existencia
 
 
 //obtener los productos activos de una compañia ordenados por NOMBRE
 public function get_productos_act_nombre($CodCompa=""){
-    $sql="SELECT 01_inv.codcia, 01_inv.clave,01_inv.clavprov, 01_inv.descr, 01inv.costo, 01inv.ventas, 01inv.ventaz, 01inv.ventam, 01inv.ventad, 01inv.ventae, 01_inv.ofers, 01_inv.ofere, 01_inv.oferd, 01_inv.oferm, 01_inv.oferz, 01inv.existen
-FROM `01_inv` , `01inv`
-WHERE 01_inv.st LIKE 'A'
-AND 01_inv.clave LIKE 01inv.clave
-ORDER BY 01_inv.descr ASC";
+    $sql="  SELECT 01_inv.codcia, 01_inv.clave,01_inv.clavprov, 01_inv.descr, 01inv.costo, 01inv.ventas, 01inv.ventaz, 01inv.ventam, 01inv.ventad, 01inv.ventae, 01_inv.ofers, 01_inv.ofere, 01_inv.oferd, 01_inv.oferm, 01_inv.oferz, 01inv.existen
+            FROM `01_inv` , `01inv`
+            WHERE 01_inv.st LIKE 'A'
+            AND 01_inv.clave LIKE 01inv.clave
+            ORDER BY 01_inv.descr ASC";
     $this->load->database($this->get_compaTXT($CodCompa),TRUE);
     $query=$this->db->query($sql);
     $data=array();
@@ -130,21 +130,21 @@ ORDER BY 01_inv.descr ASC";
                             "existen"=>$row->existen
                             );
                 }/*fin de foreach*/
-return $data;
 
+    return $data;
 }//fin de la funcion get_productos_act_nombre
 
 function get_productos_proveedor($CodCompa='',$codpro=''){
 
     //OEM  $sql="SELECT  `01_inv`.`clave`, `01_inv`.`descr`, `01_inv`.`oferm`, `01_inv`.`oferd`, `01_inv`.`ofere`, `01_inv`.`ofers`, `01_inv`.`oferz`,`01inv`.`ventam`,`01inv`.`ventad`,`01inv`.`ventas`,`01inv`.`ventak`,`01inv`.`ventac`,`01inv`.`ventaz`,`01inv`.`existen`, `01_inv`.`st` FROM  `01_inv` ,  `01inv` WHERE  `01_inv`.`clave` LIKE  '$codpro%' AND  `01inv`.`clave` LIKE  `01_inv`.`clave` AND  `01_inv`.`st` LIKE  'A' ORDER BY  `01_inv`.`descr` ASC";
-    $sql="SELECT `01_inv`.`clave` , `01_inv`.`descr` , `01_inv`.`oferm` , `01_inv`.`oferd` , `01_inv`.`ofere` , `01_inv`.`ofers` , `01_inv`.`oferz` , `01inv`.`ventam` , `01inv`.`ventad` , `01inv`.`ventas` , `01inv`.`ventak` , `01inv`.`ventac` , `01inv`.`ventaz` , `01inv`.`existen` , `01_inv`.`st`
-FROM `01_inv` , `01inv`
-WHERE `01_inv`.`clave` LIKE '$codpro%'
-AND `01inv`.`clave` LIKE `01_inv`.`clave`
-AND `01_inv`.`st` LIKE 'A'
-GROUP BY `01inv`.`clave`
-ORDER BY `01_inv`.`descr` ASC ";
- $this->load->database($this->get_compaTXT($CodCompa),TRUE);
+    $sql="  SELECT `01_inv`.`clave` , `01_inv`.`descr` , `01_inv`.`oferm` , `01_inv`.`oferd` , `01_inv`.`ofere` , `01_inv`.`ofers` , `01_inv`.`oferz` , `01inv`.`ventam` , `01inv`.`ventad` , `01inv`.`ventas` , `01inv`.`ventak` , `01inv`.`ventac` , `01inv`.`ventaz` , `01inv`.`existen` , `01_inv`.`st`
+            FROM `01_inv` , `01inv`
+            WHERE `01_inv`.`clave` LIKE '$codpro%'
+            AND `01inv`.`clave` LIKE `01_inv`.`clave`
+            AND `01_inv`.`st` LIKE 'A'
+            GROUP BY `01inv`.`clave`
+            ORDER BY `01_inv`.`descr` ASC ";
+    $this->load->database($this->get_compaTXT($CodCompa),TRUE);
     $query=$this->db->query($sql);
             $data=array();
             foreach ($query->result() as $row)

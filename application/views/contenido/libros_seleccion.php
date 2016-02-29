@@ -9,6 +9,31 @@
 <div class="container">
     
     <div class="row">
+      <div class="col s12">
+
+          <form action="<?php echo base_url().index_page();?>/librosventas/generar_libro" method="post">
+              <div class="row">
+                <div class="col s2"><input type="number" name="mes" min="01" max="12" placeholder="Mes" required/></div>
+                <div class="col s4"><input type="number" name="year" min="<?php echo date('Y')-5; ?>" max="<?php echo date('Y'); ?>" placeholder="Año" required/></div>
+                <div class="col s4">
+                  <div class="select-wrapper">
+                    <select class="initialized" name="compa" required>
+                      <option value="" disabled="" selected="">Seleccione Empresa</option>
+                      <option value="001">Dideco</option>
+                      <option value="002">Deimport</option>
+                      <option value="005">Compacto</option>
+                    </select>
+                  </div>
+                </div>
+                  <div class="col s2">
+                      <button type="submit" class="btn">Generar</button> 
+                  </div>
+              </div>
+                
+                
+
+          </form>
+      </div>
       <!--
       <form action="#">   
           <div class="col s3">
@@ -36,7 +61,7 @@
       </form>
         -->
     </div>
-
+ <!--
     <div class="row">
       <div class="col s4">
        <ul class="collection">
@@ -60,16 +85,17 @@
           </div>
 
       </div>
-    </div>
+    </div> -->
               
 </div>
 
       <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="../js/jquery-2.1.1.min.js"></script>
       <script type="text/javascript" src="../js/materialize.min.js"></script>
       <script>
 $(document).ready(function() {
     $('select').material_select();
+
 
     $('.datepicker').pickadate({
       selectMonths: true, // Creates a dropdown to control month

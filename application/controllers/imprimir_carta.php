@@ -165,6 +165,7 @@ public function imprimir_pedidos(){
 				$pdf->SetTextColor(200,100,0);
 				$pdf->Cell(1,6,utf8_decode("VENDEDOR: ".$pedidos[$i]['nombre_completo']));
 
+
 				$cliente=$this->data_complemento->get_cliente($pedidos[$i]['codcte'],$pedidos[$i]['compa']);
 				$pdf->Ln();
 				$pdf->SetX(5);
@@ -174,6 +175,16 @@ public function imprimir_pedidos(){
 
 				$pdf->SetTextColor(50,50,50);
 				
+				$datos_pedido=array(
+						'codcia'=>$pedidos[$i]['compa'],
+						'codcte'=>$cliente["codcte"],
+						'zona'=>$cliente["zona"],
+						'nro_pedido'=>$pedidos[$i]['id']
+
+					);
+				var_dump($datos_pedido);
+				 exit();
+
 				//Fecha		
 				if(strlen(($cliente['razsoc']))<36){
 									$pdf->SetX(137);
@@ -210,12 +221,13 @@ public function imprimir_pedidos(){
 							if($nro<10){$nro=" ".$nro;}
 
 							$descr=$this->data_complemento->get_descripcion_producto($obj[$e]->cod_producto,$this->data_complemento->get_compaTXT($pedidos[$i]['compa']));
-							
+						
 							if($pdf->GetY()>262){
 								//º$pdf->Cell(1,7,"Continuacion del pedido [".$pedidos[$i]['id']."] en la siguiente paguina  sig. producto (".$nro.")  >>>>>");
 								$pdf->Cell(1,7,"Pag. Act (".$pdf->PageNo().") Continuacion del pedido [".$pedidos[$i]['id']."] en la siguiente paguina  sig. producto (".$nro.")>>");
 								$pdf->Ln();
 							}
+								//var_dump($obj[$e]); exit();
 							if($obj[$e]->cantidad<10){
 								$pdf->Cell(1,7,$nro.")      ".$obj[$e]->cod_producto."      [ ".$obj[$e]->cantidad."]       ".$descr);
 							}else{

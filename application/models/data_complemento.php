@@ -1100,9 +1100,9 @@ function todos_pedidos_A(){
                     $this->temporal[]=array('id'=>$row->id,'compa'=>$row->compa,'nombre_completo'=>$row->nombre_completo,'zona'=>$row->zona,'codcte'=>$row->codcte,'fecha'=>$row->fecha,'nota'=>$row->nota,'status'=>$row->status,'tipo'=>$row->tipo);
                 }
     //Actualizo el Status
-    $sql="UPDATE `pedidos` SET `pedidos`.`status`='I' WHERE `pedidos`.`status` LIKE 'A'"; 
-    $this->load->database('default',TRUE);
-    $query=$this->db->query($sql);  
+   // $sql="UPDATE `pedidos` SET `pedidos`.`status`='I' WHERE `pedidos`.`status` LIKE 'A'"; 
+   // $this->load->database('default',TRUE);
+   // $query=$this->db->query($sql);  
           
 return $this->temporal;
 }//ultimo pedido  del usuario

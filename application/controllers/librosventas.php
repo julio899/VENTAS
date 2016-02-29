@@ -15,6 +15,22 @@ class Librosventas extends CI_Controller {
 				redirect('identificacion/redireccion');
 			}	
 	}
+	public function generar_libro(){
+		if($this->input->post('mes') && $this->input->post('year') && $this->input->post('compa')){
+			//var_dump($this->input->post('compa') );
+			$mes="";
+			if($this->input->post('mes')<10 ){
+				$mes='0'.$this->input->post('mes');
+			}else{
+				$mes=$this->input->post('mes');
+			}
+				redirect('imprimir/imp_fac_ventas/'.$this->input->post('compa').'/'.$mes.'/'.substr($this->input->post('year'), -2,2) );
+			
+			
+		}else{
+			echo "Falto la recibir algun dato porfavor verifique.";
+		}
+	}
 
  //imprimir/imp_fac_ventas/008/01/16
 }
